@@ -36,6 +36,7 @@ public class QueryActivity extends Activity {
         //</editor-fold>
 
         CardAssetProcesser cardAssetProcesser = new CardAssetProcesser(this);
+        cardAssetProcesser.setForcedUpdate(true);
         cardAssetProcesser.execute();
     }
 

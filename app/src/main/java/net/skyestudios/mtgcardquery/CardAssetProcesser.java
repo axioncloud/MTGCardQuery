@@ -8,10 +8,13 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 
 /**
@@ -26,6 +29,8 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
     private long elapsedMinutes;
     private long secondsDisplay;
     private long elapsedMillis;
+    private File allCardsFile;
+    private Boolean isForcedUpdate;
 
     /**
      * Creates a new asynchronous task. This constructor must be invoked on the UI thread.
@@ -37,6 +42,10 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
         this.fileFragments = 12;
     }
 
+    public void setForcedUpdate(Boolean forcedUpdate) {
+        isForcedUpdate = forcedUpdate;
+    }
+
     /**
      * Runs on the UI thread before {@link #doInBackground}.
      *
@@ -46,6 +55,7 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+
     }
 
     /**
@@ -65,19 +75,91 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
         long initialTime = System.currentTimeMillis();
+        //check current MTGJSON.com version
+        //compare local version
+        //if same then cancel
+        //else continue
+        try {
+            URL url = new URL("https://mtgjson.com/json/version.json");
+            URLConnection connection = url
+                    .openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            LineNumberReader LNR = new LineNumberReader(
+                    new InputStreamReader(connection.getInputStream()));
+            File versionFile = new File(activity.getFilesDir(), "MTGJSON.version");
+            String versionID = LNR.readLine().replace("\"", "");
+            if (versionFile.exists() &&
+                    !isForcedUpdate) {
+                LineNumberReader LNR2 = new LineNumberReader(
+                        new InputStreamReader(
+                                new FileInputStream(versionFile)));
+                String currentVersionID = LNR2.readLine();
+                if (versionID.equals(currentVersionID)) {
+                    LNR.close();
+                    LNR2.close();
+                    cancel(true);
+                } else {
+                    LNR.close();
+                    LNR2.close();
+                    FileWriter FW = new FileWriter(versionFile);
+                    FW.write(versionID);
+                    FW.close();
+                }
+            } else {
+                versionFile.createNewFile();
+                allCardsFile = new File(activity.getFilesDir(), "AllCards.json");
+                if (allCardsFile.exists()) {
+                    URL allCardsURL = new URL("https://mtgjson.com/json/AllSets-x.json");
+                    URLConnection allCardsConnection = allCardsURL
+                            .openConnection();
+                    allCardsConnection.setDoInput(true);
+                    allCardsConnection.connect();
+                    StringBuilder SB = new StringBuilder();
+                    BufferedReader LNR3 = new BufferedReader(new InputStreamReader(allCardsConnection.getInputStream()));
+                    String line = LNR3.readLine();
+                    FileWriter FW2 = new FileWriter(allCardsFile);
 
-        fragmentJSON();
-
-        for (int i = 0; i < fileFragments; i++) {
-            processFragment(i);
+                    FW2.write(line);
+                    FW2.flush();
+                    FW2.close();
+                } else {
+                    allCardsFile.createNewFile();
+                    URL allCardsURL = new URL("https://mtgjson.com/json/AllSets-x.json");
+                    URLConnection allCardsConnection = allCardsURL
+                            .openConnection();
+                    allCardsConnection.setDoInput(true);
+                    allCardsConnection.connect();
+                    StringBuilder SB = new StringBuilder();
+                    LineNumberReader LNR3 = new LineNumberReader(new InputStreamReader(allCardsConnection.getInputStream()));
+                    String line = LNR3.readLine();
+                    FileWriter FW2 = new FileWriter(allCardsFile);
+                    FW2.write(line);
+                    FW2.flush();
+                    FW2.close();
+                }
+                FileWriter FW = new FileWriter(versionFile);
+                FW.write(versionID);
+                FW.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        long deltaTime = System.currentTimeMillis() - initialTime;
+        if (!isCancelled()) {
+            fragmentJSON();
 
-        elapsedMillis = deltaTime % 1000;
-        long elapsedSeconds = deltaTime / 1000;
-        secondsDisplay = elapsedSeconds % 60;
-        elapsedMinutes = elapsedSeconds / 60;
+            for (int i = 0; i < fileFragments; i++) {
+                processFragment(i);
+            }
+
+            long deltaTime = System.currentTimeMillis() - initialTime;
+
+            elapsedMillis = deltaTime % 1000;
+            long elapsedSeconds = deltaTime / 1000;
+            secondsDisplay = elapsedSeconds % 60;
+            elapsedMinutes = elapsedSeconds / 60;
+        }
         return null;
     }
 
@@ -95,26 +177,13 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        CardAssetProcessorNotification.notify(activity, String.format("%s \\\\%dm:%ds:%sms//", "Complete", elapsedMinutes, secondsDisplay, elapsedMillis), 0);
-    }
-
-    /**
-     * Runs on the UI thread after {@link #publishProgress} is invoked.
-     * The specified values are the values passed to {@link #publishProgress}.
-     *
-     * @param values The values indicating progress.
-     * @see #publishProgress
-     * @see #doInBackground
-     */
-    @Override
-    protected void onProgressUpdate(Void... values) {
-        super.onProgressUpdate(values);
+        CardAssetProcessorNotification.notify(activity, String.format("%s \\\\%dm:%ds:%dms//", "Complete", elapsedMinutes, secondsDisplay, elapsedMillis), 0);
     }
 
     private void fragmentJSON() {
         try {
             ArrayList<String> lines = new ArrayList<>();
-            LineNumberReader LNR = new LineNumberReader(new InputStreamReader(activity.getAssets().open("AllCards-x.json")));
+            LineNumberReader LNR = new LineNumberReader(new InputStreamReader(new FileInputStream(allCardsFile)));
 
             StringBuilder SB = new StringBuilder();
             String line = LNR.readLine();

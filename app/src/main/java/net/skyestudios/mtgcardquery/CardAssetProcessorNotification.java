@@ -74,10 +74,6 @@ public class CardAssetProcessorNotification {
                 // notification drawer on devices running Android 3.0 or later.
                 .setLargeIcon(picture)
 
-                .setOngoing(true)
-
-                .setCategory(Notification.CATEGORY_STATUS)
-
                 // Automatically dismiss the notification when it is touched.
                 .setAutoCancel(true);
 
