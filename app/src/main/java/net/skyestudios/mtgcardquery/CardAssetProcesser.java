@@ -17,6 +17,8 @@ import java.io.LineNumberReader;
 import java.net.URL;
 import java.net.URLConnection;
 
+import static android.R.attr.lines;
+
 /**
  * Created by arkeonet64 on 3/6/2017.
  */
@@ -143,10 +145,10 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
                     FileOutputStream FOS = new FileOutputStream(allCardsFile);
                     InputStream IS = allCardsConnection.getInputStream();
                     byte[] buffer = new byte[1024];
-                    int read;
-                    while ((read = IS.read(buffer)) != -1) {
-                        FOS.write(buffer, 0, read);
-                        allCardsFileLength += read;
+                    int bufferSize;
+                    while ((bufferSize = IS.read(buffer)) != -1) {
+                        FOS.write(buffer, 0, bufferSize);
+                        allCardsFileLength += bufferSize;
                     }
                     IS.close();
                     FOS.flush();
@@ -161,10 +163,10 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
                     FileOutputStream FOS = new FileOutputStream(allCardsFile);
                     InputStream IS = allCardsConnection.getInputStream();
                     byte[] buffer = new byte[1024];
-                    int read;
-                    while ((read = IS.read(buffer)) != -1) {
-                        FOS.write(buffer, 0, read);
-                        allCardsFileLength += read;
+                    int bufferSize;
+                    while ((bufferSize = IS.read(buffer)) != -1) {
+                        FOS.write(buffer, 0, bufferSize);
+                        allCardsFileLength += bufferSize;
                     }
                     IS.close();
                     FOS.flush();
@@ -209,61 +211,80 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
             ////Fragment using (fileLength * fragmentIndex + 1) / fileFragments
             ////Using same range style (line is between minLine and maxLine), find spot to fragment file,
             /////Using that offset start there and repeat until finished
+            String bufferString;
 
-            /*int numLines = lines.size();
+            byte[] buffer = new byte[2048];
 
-            int lineFragmentSize = numLines / fileFragments;
-            int lineBufferSize = 100;
+            int bufferFragmentSize = (int) (allCardsFileLength / fileFragments);
+            int bufferPaddingSize = 100;
 
-            int fileLineNumber = 0;
+            int fileCharacterNumber = 0;
 
 
             for (int fragmentIndex = 0; fragmentIndex < fileFragments; fragmentIndex++) {
                 int numOpens = 0;
-                line = "null";
+                int bufferSize = 0;
 
                 File fragment = new File(activity.getFilesDir(),
                         fragmentPrefix + fragmentIndex + ".json");
                 FileWriter FW = new FileWriter(fragment);
 
-                int minLine = (lineFragmentSize * (fragmentIndex + 1)) - lineBufferSize;
-                int maxLine = (lineFragmentSize * (fragmentIndex + 1)) + lineBufferSize;
+                int minBufferSize = (bufferFragmentSize * (fragmentIndex + 1)) - bufferPaddingSize;
+                int maxBufferSize = (bufferFragmentSize * (fragmentIndex + 1)) + bufferPaddingSize;
+
                 if (fragmentIndex >= 1) {
-                    SB.append("{\n");
+                    SB.append("{");
                     numOpens++;
                 }
 
-                for (int fragmentLineNumber = fileLineNumber;
-                     fragmentLineNumber < numLines &&
-                             line != null &&
-                             lines.get(fragmentLineNumber) != null;
+                while ((bufferSize = FIS.read(buffer)) != -1) {
+                    bufferString = new String(buffer, "UTF-8");
+                    for (Character character :
+                            bufferString.toCharArray()) {
+                        if (character.equals("{")) {
+                            numOpens++;
+                        } else if (character.equals("}")) {
+                            numOpens--;
+                        }
+
+                        if (numOpens == 1 &&
+                                fileCharacterNumber >= minBufferSize &&
+                                fileCharacterNumber <= maxBufferSize) {
+                            bufferString = bufferString.replace("},", "}");
+                            buffer = bufferString.getBytes("UTF-8");
+                            FOS.write(buffer, 0, buffer.length);
+                            break;
+                        }
+                    }
+                    fileCharacterNumber++;
+                }
+
+
+                /*for (int fragmentLineNumber = fileCharacterNumber;
+                     fragmentLineNumber < allCardsFileLength &&
+                             bufferString != null;
                      fragmentLineNumber++,
-                             fileLineNumber++) {
+                             fileCharacterNumber++) {
 
-                    line = lines.get(fragmentLineNumber);
+                    bufferString = lines.get(fragmentLineNumber);
 
-                    if (line.contains("{")) {
-                        numOpens++;
-                    }
-                    if (line.contains("}")) {
-                        numOpens--;
-                    }
 
                     if (numOpens == 1 &&
-                            ((fragmentLineNumber >= minLine &&
-                                    fragmentLineNumber <= maxLine &&
+                            ((fragmentLineNumber >= minBufferSize &&
+                                    fragmentLineNumber <= maxBufferSize &&
                                     fragmentIndex != fileFragments))) {
-                        SB.append(line.replace(",", "")).append("\n");
-                        line = null;
+                        SB.append(bufferString.replace(",", "")).append("\n");
+                        bufferString = null;
                     } else {
-                        SB.append(line).append("\n");
+                        SB.append(bufferString).append("\n");
                     }
                 }
                 SB.append("}");
                 FW.write(SB.toString());
                 FW.close();
                 SB.delete(0, SB.length());
-            }*/
+                */
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
