@@ -198,6 +198,7 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
 
     private void fragmentJSON() {
         try {
+
             FileInputStream FIS = new FileInputStream(allCardsFile);
 
             StringBuilder SB = new StringBuilder();
@@ -209,10 +210,10 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
             /////Using that offset start there and repeat until finished
             String bufferString;
 
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[128];
 
             int bufferFragmentSize = (int) (allCardsFileLength / fileFragments);
-            int bufferPaddingSize = 100;
+            int bufferPaddingSize = buffer.length;
 
             int fileCharacterNumber = 0;
 
@@ -234,26 +235,19 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
 
                 while ((bufferSize = FIS.read(buffer)) != -1) {
                     bufferString = new String(buffer, "UTF-8");
-                    char[] charArray = bufferString.toCharArray();
-                    for (int index = 0; index < charArray.length; index++, fileCharacterNumber++) {
-                        if (charArray[index] == '{') {
-                            numOpens++;
-                        } else if (charArray[index] == '}') {
-                            numOpens--;
-                        }
-
-                        if (numOpens == 1 &&
-                                fileCharacterNumber >= minBufferSize &&
-                                fileCharacterNumber <= maxBufferSize) {
-                            bufferString = bufferString.substring(fileCharacterNumber, fileCharacterNumber + 1) + bufferString.substring(fileCharacterNumber + 1);
-                            buffer = bufferString.getBytes("UTF-8");
-                            FOS.write(buffer, 0, buffer.length);
-                            break;
-                        }
+                    numOpens += bufferString.split("\\{", -1).length - 1;
+                    String s = bufferString.replaceAll("[^\\{]*($)?", "");
+                    numOpens -= bufferString.split("\\}", -1).length - 1;
+                    if (numOpens == 1 &&
+                            fileCharacterNumber >= minBufferSize &&
+                            fileCharacterNumber <= maxBufferSize) {
+                        bufferString = bufferString.substring(fileCharacterNumber, fileCharacterNumber + 1) + bufferString.substring(fileCharacterNumber + 1);
+                        buffer = bufferString.getBytes("UTF-8");
+                        FOS.write(buffer, 0, bufferSize);
+                        break;
                     }
+                    fileCharacterNumber += bufferSize;
                 }
-
-
                 /*for (int fragmentLineNumber = fileCharacterNumber;
                      fragmentLineNumber < allCardsFileLength &&
                              bufferString != null;
