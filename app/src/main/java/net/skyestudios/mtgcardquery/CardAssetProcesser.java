@@ -17,8 +17,6 @@ import java.io.LineNumberReader;
 import java.net.URL;
 import java.net.URLConnection;
 
-import static android.R.attr.lines;
-
 /**
  * Created by arkeonet64 on 3/6/2017.
  */
@@ -151,7 +149,7 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
                         allCardsFileLength += bufferSize;
                     }
                     IS.close();
-                    FOS.flush();
+                    FOS.getFD().sync();
                     FOS.close();
                 } else {
                     allCardsFile.createNewFile();
@@ -169,7 +167,7 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
                         allCardsFileLength += bufferSize;
                     }
                     IS.close();
-                    FOS.flush();
+                    FOS.getFD().sync();
                     FOS.close();
                 }
                 FileWriter FW = new FileWriter(versionFile);
@@ -201,8 +199,6 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
     private void fragmentJSON() {
         try {
             FileInputStream FIS = new FileInputStream(allCardsFile);
-            FileOutputStream FOS = new FileOutputStream(allCardsFile);
-
 
             StringBuilder SB = new StringBuilder();
 
@@ -213,13 +209,12 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
             /////Using that offset start there and repeat until finished
             String bufferString;
 
-            byte[] buffer = new byte[2048];
+            byte[] buffer = new byte[1024];
 
             int bufferFragmentSize = (int) (allCardsFileLength / fileFragments);
             int bufferPaddingSize = 100;
 
             int fileCharacterNumber = 0;
-
 
             for (int fragmentIndex = 0; fragmentIndex < fileFragments; fragmentIndex++) {
                 int numOpens = 0;
@@ -227,7 +222,7 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
 
                 File fragment = new File(activity.getFilesDir(),
                         fragmentPrefix + fragmentIndex + ".json");
-                FileWriter FW = new FileWriter(fragment);
+                FileOutputStream FOS = new FileOutputStream(fragment);
 
                 int minBufferSize = (bufferFragmentSize * (fragmentIndex + 1)) - bufferPaddingSize;
                 int maxBufferSize = (bufferFragmentSize * (fragmentIndex + 1)) + bufferPaddingSize;
@@ -239,24 +234,23 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
 
                 while ((bufferSize = FIS.read(buffer)) != -1) {
                     bufferString = new String(buffer, "UTF-8");
-                    for (Character character :
-                            bufferString.toCharArray()) {
-                        if (character.equals("{")) {
+                    char[] charArray = bufferString.toCharArray();
+                    for (int index = 0; index < charArray.length; index++, fileCharacterNumber++) {
+                        if (charArray[index] == '{') {
                             numOpens++;
-                        } else if (character.equals("}")) {
+                        } else if (charArray[index] == '}') {
                             numOpens--;
                         }
 
                         if (numOpens == 1 &&
                                 fileCharacterNumber >= minBufferSize &&
                                 fileCharacterNumber <= maxBufferSize) {
-                            bufferString = bufferString.replace("},", "}");
+                            bufferString = bufferString.substring(fileCharacterNumber, fileCharacterNumber + 1) + bufferString.substring(fileCharacterNumber + 1);
                             buffer = bufferString.getBytes("UTF-8");
                             FOS.write(buffer, 0, buffer.length);
                             break;
                         }
                     }
-                    fileCharacterNumber++;
                 }
 
 
