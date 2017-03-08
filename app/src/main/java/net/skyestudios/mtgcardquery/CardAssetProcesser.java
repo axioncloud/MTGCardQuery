@@ -8,14 +8,14 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
 
 /**
  * Created by arkeonet64 on 3/6/2017.
@@ -31,6 +31,7 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
     private long elapsedMillis;
     private File allCardsFile;
     private Boolean isForcedUpdate;
+    private long allCardsFileLength;
 
     /**
      * Creates a new asynchronous task. This constructor must be invoked on the UI thread.
@@ -40,6 +41,7 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
         this.activity = activity;
         this.fragmentPrefix = "JSONfragment_";
         this.fileFragments = 12;
+        this.allCardsFileLength = 0;
     }
 
     public void setForcedUpdate(Boolean forcedUpdate) {
@@ -110,33 +112,40 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
                 versionFile.createNewFile();
                 allCardsFile = new File(activity.getFilesDir(), "AllCards.json");
                 if (allCardsFile.exists()) {
-                    URL allCardsURL = new URL("https://mtgjson.com/json/AllSets-x.json");
+                    URL allCardsURL = new URL("https://mtgjson.com/json/AllCards-x.json");
                     URLConnection allCardsConnection = allCardsURL
                             .openConnection();
                     allCardsConnection.setDoInput(true);
                     allCardsConnection.connect();
-                    StringBuilder SB = new StringBuilder();
-                    BufferedReader LNR3 = new BufferedReader(new InputStreamReader(allCardsConnection.getInputStream()));
-                    String line = LNR3.readLine();
-                    FileWriter FW2 = new FileWriter(allCardsFile);
-
-                    FW2.write(line);
-                    FW2.flush();
-                    FW2.close();
+                    FileOutputStream FOS = new FileOutputStream(allCardsFile);
+                    InputStream IS = allCardsConnection.getInputStream();
+                    byte[] buffer = new byte[1024];
+                    int read;
+                    while ((read = IS.read(buffer)) != -1) {
+                        FOS.write(buffer, 0, read);
+                        allCardsFileLength += read;
+                    }
+                    IS.close();
+                    FOS.flush();
+                    FOS.close();
                 } else {
                     allCardsFile.createNewFile();
-                    URL allCardsURL = new URL("https://mtgjson.com/json/AllSets-x.json");
+                    URL allCardsURL = new URL("https://mtgjson.com/json/AllCards-x.json");
                     URLConnection allCardsConnection = allCardsURL
                             .openConnection();
                     allCardsConnection.setDoInput(true);
                     allCardsConnection.connect();
-                    StringBuilder SB = new StringBuilder();
-                    LineNumberReader LNR3 = new LineNumberReader(new InputStreamReader(allCardsConnection.getInputStream()));
-                    String line = LNR3.readLine();
-                    FileWriter FW2 = new FileWriter(allCardsFile);
-                    FW2.write(line);
-                    FW2.flush();
-                    FW2.close();
+                    FileOutputStream FOS = new FileOutputStream(allCardsFile);
+                    InputStream IS = allCardsConnection.getInputStream();
+                    byte[] buffer = new byte[1024];
+                    int read;
+                    while ((read = IS.read(buffer)) != -1) {
+                        FOS.write(buffer, 0, read);
+                        allCardsFileLength += read;
+                    }
+                    IS.close();
+                    FOS.flush();
+                    FOS.close();
                 }
                 FileWriter FW = new FileWriter(versionFile);
                 FW.write(versionID);
@@ -182,20 +191,19 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
 
     private void fragmentJSON() {
         try {
-            ArrayList<String> lines = new ArrayList<>();
-            LineNumberReader LNR = new LineNumberReader(new InputStreamReader(new FileInputStream(allCardsFile)));
+            FileInputStream FIS = new FileInputStream(allCardsFile);
+            FileOutputStream FOS = new FileOutputStream(allCardsFile);
+
 
             StringBuilder SB = new StringBuilder();
-            String line = LNR.readLine();
-            lines.add(line);
 
-            while (line != null) {
-                line = LNR.readLine();
-                lines.add(line);
-            }
-            LNR.close();
+            //TODO Convert readLine style to buffered array
+            ////Read byte array and count number of opens and closes on brackets
+            ////Fragment using (fileLength * fragmentIndex + 1) / fileFragments
+            ////Using same range style (line is between minLine and maxLine), find spot to fragment file,
+            /////Using that offset start there and repeat until finished
 
-            int numLines = lines.size();
+            /*int numLines = lines.size();
 
             int lineFragmentSize = numLines / fileFragments;
             int lineBufferSize = 100;
@@ -248,7 +256,7 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
                 FW.write(SB.toString());
                 FW.close();
                 SB.delete(0, SB.length());
-            }
+            }*/
         } catch (IOException e) {
             e.printStackTrace();
         }
