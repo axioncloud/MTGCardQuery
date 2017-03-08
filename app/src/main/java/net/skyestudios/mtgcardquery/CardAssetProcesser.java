@@ -77,6 +77,29 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
         long initialTime = System.currentTimeMillis();
+        if (!isCancelled()) {
+            updateCards();
+        }
+
+
+        if (!isCancelled()) {
+            fragmentJSON();
+
+            for (int i = 0; i < fileFragments; i++) {
+                processFragment(i);
+            }
+
+            long deltaTime = System.currentTimeMillis() - initialTime;
+
+            elapsedMillis = deltaTime % 1000;
+            long elapsedSeconds = deltaTime / 1000;
+            secondsDisplay = elapsedSeconds % 60;
+            elapsedMinutes = elapsedSeconds / 60;
+        }
+        return null;
+    }
+
+    private void updateCards() {
         //check current MTGJSON.com version
         //compare local version
         //if same then cancel
@@ -154,22 +177,6 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        if (!isCancelled()) {
-            fragmentJSON();
-
-            for (int i = 0; i < fileFragments; i++) {
-                processFragment(i);
-            }
-
-            long deltaTime = System.currentTimeMillis() - initialTime;
-
-            elapsedMillis = deltaTime % 1000;
-            long elapsedSeconds = deltaTime / 1000;
-            secondsDisplay = elapsedSeconds % 60;
-            elapsedMinutes = elapsedSeconds / 60;
-        }
-        return null;
     }
 
     /**
