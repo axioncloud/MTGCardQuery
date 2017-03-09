@@ -1,29 +1,34 @@
 package net.skyestudios.mtgcardquery;
 
 import android.app.Activity;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.util.JsonReader;
 import android.util.Log;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.LineNumberReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Locale;
 
 /**
  * Created by arkeonet64 on 3/6/2017.
  */
 
-class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
+class CardAssetProcesser extends AsyncTask<Void, String, Void> {
     private String fragmentPrefix;
     private Activity activity;
     private int fileFragments;
@@ -34,9 +39,12 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
     private File allCardsFile;
     private Boolean isForcedUpdate;
     private long allCardsFileLength;
+    private ConnectivityManager connectivityManager;
+    private NetworkInfo activeNetworkInfo;
 
     /**
      * Creates a new asynchronous task. This constructor must be invoked on the UI thread.
+     * @param activity
      */
     public CardAssetProcesser(Activity activity) {
         super();
@@ -44,10 +52,16 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
         this.fragmentPrefix = "JSONfragment_";
         this.fileFragments = 12;
         this.allCardsFileLength = 0;
+        this.connectivityManager = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        this.activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        this.isForcedUpdate = false;
     }
 
-    public void setForcedUpdate(Boolean forcedUpdate) {
-        isForcedUpdate = forcedUpdate;
+    /**
+     * Sets the flag to forcefully update
+     */
+    public void setForcedUpdate() {
+        isForcedUpdate = true;
     }
 
     /**
@@ -79,102 +93,93 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
         long initialTime = System.currentTimeMillis();
-        if (!isCancelled()) {
+
+        if (!isCancelled() && activeNetworkInfo.isConnected()) {
             updateCards();
         }
 
-
         if (!isCancelled()) {
             fragmentJSON();
-
             for (int i = 0; i < fileFragments; i++) {
                 processFragment(i);
             }
-
-            long deltaTime = System.currentTimeMillis() - initialTime;
-
-            elapsedMillis = deltaTime % 1000;
-            long elapsedSeconds = deltaTime / 1000;
-            secondsDisplay = elapsedSeconds % 60;
-            elapsedMinutes = elapsedSeconds / 60;
         }
+
+        long deltaTime = System.currentTimeMillis() - initialTime;
+        elapsedMillis = deltaTime % 1000;
+        long elapsedSeconds = deltaTime / 1000;
+        secondsDisplay = elapsedSeconds % 60;
+        elapsedMinutes = elapsedSeconds / 60;
         return null;
     }
 
     private void updateCards() {
-        //check current MTGJSON.com version
-        //compare local version
-        //if same then cancel
-        //else continue
         try {
             URL url = new URL("https://mtgjson.com/json/version.json");
             URLConnection connection = url
                     .openConnection();
             connection.setDoInput(true);
             connection.connect();
-            LineNumberReader LNR = new LineNumberReader(
-                    new InputStreamReader(connection.getInputStream()));
-            File versionFile = new File(activity.getFilesDir(), "MTGJSON.version");
-            String versionID = LNR.readLine().replace("\"", "");
+            BufferedInputStream BIS = new BufferedInputStream(connection.getInputStream());
+            File versionFile = new File(activity.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "MTGJSON.version");
+            byte[] versionBytes = new byte[512];
+            int readBytes = BIS.read(versionBytes);
+            String versionID = new String(versionBytes, 0, readBytes, "UTF-8").replace("\"", "");
             if (versionFile.exists() &&
                     !isForcedUpdate) {
-                LineNumberReader LNR2 = new LineNumberReader(
-                        new InputStreamReader(
-                                new FileInputStream(versionFile)));
-                String currentVersionID = LNR2.readLine();
+                BufferedInputStream BIS2 = new BufferedInputStream(new FileInputStream(versionFile));
+                readBytes = BIS2.read(versionBytes);
+                String currentVersionID = new String(versionBytes, 0, readBytes, "UTF-8").replace("\"", "");
                 if (versionID.equals(currentVersionID)) {
-                    LNR.close();
-                    LNR2.close();
-                    cancel(true);
+                    BIS.close();
+                    BIS2.close();
+                    cancel(false);
                 } else {
-                    LNR.close();
-                    LNR2.close();
-                    FileWriter FW = new FileWriter(versionFile);
-                    FW.write(versionID);
-                    FW.close();
+                    BIS.close();
+                    BIS2.close();
+                    BufferedOutputStream BOS = new BufferedOutputStream(new FileOutputStream(versionFile));
+                    BOS.write(versionID.getBytes("UTF-8"));
+                    BOS.close();
                 }
             } else {
                 versionFile.createNewFile();
-                allCardsFile = new File(activity.getFilesDir(), "AllCards.json");
+                allCardsFile = new File(activity.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "AllCards.json");
                 if (allCardsFile.exists()) {
                     URL allCardsURL = new URL("https://mtgjson.com/json/AllCards-x.json");
                     URLConnection allCardsConnection = allCardsURL
                             .openConnection();
-                    allCardsConnection.setDoInput(true);
                     allCardsConnection.connect();
-                    FileOutputStream FOS = new FileOutputStream(allCardsFile);
+                    BufferedOutputStream BOS = new BufferedOutputStream(new FileOutputStream(allCardsFile));
                     InputStream IS = allCardsConnection.getInputStream();
-                    byte[] buffer = new byte[1024];
+                    byte[] buffer = new byte[2048];
                     int bufferSize;
                     while ((bufferSize = IS.read(buffer)) != -1) {
-                        FOS.write(buffer, 0, bufferSize);
+                        BOS.write(buffer, 0, bufferSize);
                         allCardsFileLength += bufferSize;
                     }
                     IS.close();
-                    FOS.getFD().sync();
-                    FOS.close();
+                    BOS.close();
                 } else {
                     allCardsFile.createNewFile();
                     URL allCardsURL = new URL("https://mtgjson.com/json/AllCards-x.json");
                     URLConnection allCardsConnection = allCardsURL
                             .openConnection();
-                    allCardsConnection.setDoInput(true);
                     allCardsConnection.connect();
-                    FileOutputStream FOS = new FileOutputStream(allCardsFile);
+                    BufferedOutputStream BOS = new BufferedOutputStream(new FileOutputStream(allCardsFile));
                     InputStream IS = allCardsConnection.getInputStream();
-                    byte[] buffer = new byte[1024];
+                    byte[] buffer = new byte[2048];
                     int bufferSize;
                     while ((bufferSize = IS.read(buffer)) != -1) {
-                        FOS.write(buffer, 0, bufferSize);
+                        BOS.write(buffer, 0, bufferSize);
                         allCardsFileLength += bufferSize;
                     }
                     IS.close();
-                    FOS.getFD().sync();
-                    FOS.close();
+                    BOS.close();
+                    BOS = new BufferedOutputStream(new FileOutputStream(versionFile));
+                    BOS.write(versionID.getBytes("UTF-8"));
+                    BOS.close();
                 }
-                FileWriter FW = new FileWriter(versionFile);
-                FW.write(versionID);
-                FW.close();
+                isForcedUpdate = false;
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -195,147 +200,120 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        CardAssetProcessorNotification.notify(activity, String.format("%s \\\\%dm:%ds:%dms//", "Complete", elapsedMinutes, secondsDisplay, elapsedMillis), 0);
+        if (!isCancelled()) {
+            CardAssetProcessorNotification.notify(activity, String.format("%s \\\\%dm:%ds:%dms//",
+                    "Successful", elapsedMinutes, secondsDisplay, elapsedMillis), 0);
+        } else {
+            CardAssetProcessorNotification.notify(activity, String.format("%s \\\\%dm:%ds:%dms//",
+                    "Complete", elapsedMinutes, secondsDisplay, elapsedMillis), 0);
+        }
     }
 
     private void fragmentJSON() {
         try {
+            BufferedInputStream FIS = new BufferedInputStream(new FileInputStream(allCardsFile));
 
-            FileInputStream FIS = new FileInputStream(allCardsFile);
-
-            StringBuilder SB = new StringBuilder();
-
-            //TODO Convert readLine style to buffered array
-            ////Read byte array and count number of opens and closes on brackets
-            ////Fragment using (fileLength * fragmentIndex + 1) / fileFragments
-            ////Using same range style (line is between minLine and maxLine), find spot to fragment file,
-            /////Using that offset start there and repeat until finished
             String bufferString;
 
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[4096];
 
             int bufferFragmentSize = (int) (allCardsFileLength / fileFragments);
-            int bufferPaddingSize = buffer.length * 2;
+            int bufferPaddingSize = buffer.length;
 
             int fileCharacterNumber = 0;
 
             String overFlowStrngBuffer = null;
-            FileOutputStream FOS = null;
+            BufferedOutputStream BOS = null;
             File fragment = null;
+            int numOpens = 0;
 
             for (int fragmentIndex = 0; fragmentIndex < fileFragments; ) {
-                int numOpens = 0;
                 int bufferSize = 0;
 
                 if (overFlowStrngBuffer == null) {
-                    fragment = new File(activity.getFilesDir(),
+                    fragment = new File(activity.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
                             fragmentPrefix + fragmentIndex + ".json");
-                    FOS = new FileOutputStream(fragment);
+                    BOS = new BufferedOutputStream(new FileOutputStream(fragment));
                 }
 
                 int minBufferSize = (bufferFragmentSize * (fragmentIndex + 1)) - bufferPaddingSize;
                 int maxBufferSize = (bufferFragmentSize * (fragmentIndex + 1)) + bufferPaddingSize;
 
-                if (fragmentIndex >= 1) {
-                    SB.append("{");
-                    numOpens++;
-                }
-
                 while ((bufferSize = FIS.read(buffer)) != -1) {
-                    bufferString = new String(buffer, "UTF-8");
+                    bufferString = new String(buffer, 0, bufferSize, "UTF-8");
+
                     int opens = StringUtils.countMatches(bufferString, '{');
-                    int closes = StringUtils.countMatches(bufferString, '{');
+                    int closes = StringUtils.countMatches(bufferString, '}');
 
                     if (fileCharacterNumber >= minBufferSize &&
                             fileCharacterNumber <= maxBufferSize) {
-                        // if a close would make numCloses == 1,
-                        // get that position,
-                        // write data to that close,
-                        // set FOS to next fragment,
-                        // write remaining data after close to end of buffer,
-                        // repeat
 
-                        int close = 0;
-                        for (; close < closes; close++) {
-                            if (numOpens - close == 1) {
-                                break;
-                            }
-                        }
+                        int closingIndex = searchClosingIndex(bufferString, numOpens);
 
                         if (fragmentIndex < fileFragments - 1) {
-                            String partition0 = bufferString.substring(0, StringUtils.ordinalIndexOf(bufferString, "}", close + 2) + 1) + "}";
-                            FOS.write(partition0.getBytes("UTF-8"));
-                            FOS.flush();
-                            FOS.close();
+                            String partition0 = bufferString.substring(0, closingIndex + 1) + "}";
 
-                            fragment = new File(activity.getFilesDir(),
+                            BOS.write(partition0.getBytes("UTF-8"));
+                            BOS.flush();
+                            BOS.close();
+
+                            fragment = new File(activity.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
                                     fragmentPrefix + ++fragmentIndex + ".json");
-                            FOS = new FileOutputStream(fragment);
+                            BOS = new BufferedOutputStream(new FileOutputStream(fragment));
+                            overFlowStrngBuffer = "{" + bufferString.substring(closingIndex + 2);
 
-                            overFlowStrngBuffer = "{" + bufferString.substring(StringUtils.ordinalIndexOf(bufferString, "}", close + 2) + 2);
-                            FOS.write(overFlowStrngBuffer.getBytes("UTF-8"));
+                            BOS.write(overFlowStrngBuffer.getBytes("UTF-8"));
 
-                            fileCharacterNumber += bufferString.length();
+                            fileCharacterNumber += bufferSize;
+
+                            numOpens = StringUtils.countMatches(overFlowStrngBuffer, "{") -
+                                    StringUtils.countMatches(overFlowStrngBuffer, "}");
                             break;
                         } else {
-                            if (fileCharacterNumber > allCardsFileLength) {
-                                bufferString += "}";
-                                FOS.write(bufferString.getBytes("UTF-8"));
-                                FOS.flush();
-                                FOS.close();
-
-                                fileCharacterNumber += bufferString.length();
+                            if (fileCharacterNumber + bufferSize == allCardsFileLength) {
+                                BOS.write(bufferString.getBytes("UTF-8"));
+                                BOS.flush();
+                                BOS.close();
+                                fragmentIndex++;
                                 break;
                             } else {
                                 numOpens += opens;
                                 numOpens -= closes;
-                                FOS.write(buffer, 0, bufferSize);
-
-                                fileCharacterNumber += bufferString.length();
+                                BOS.write(buffer, 0, bufferSize);
                             }
                         }
                     } else {
                         numOpens += opens;
                         numOpens -= closes;
-                        FOS.write(buffer, 0, bufferSize);
-
-                        fileCharacterNumber += bufferSize;
+                        BOS.write(buffer, 0, bufferSize);
                     }
+                    fileCharacterNumber += bufferSize;
                 }
-                /*for (int fragmentLineNumber = fileCharacterNumber;
-                     fragmentLineNumber < allCardsFileLength &&
-                             bufferString != null;
-                     fragmentLineNumber++,
-                             fileCharacterNumber++) {
-
-                    bufferString = lines.get(fragmentLineNumber);
-
-
-                    if (numOpens == 1 &&
-                            ((fragmentLineNumber >= minBufferSize &&
-                                    fragmentLineNumber <= maxBufferSize &&
-                                    fragmentIndex != fileFragments))) {
-                        SB.append(bufferString.replace(",", "")).append("\n");
-                        bufferString = null;
-                    } else {
-                        SB.append(bufferString).append("\n");
-                    }
-                }
-                SB.append("}");
-                FW.write(SB.toString());
-                FW.close();
-                SB.delete(0, SB.length());
-                */
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    private int searchClosingIndex(String searchString, int numOpens) {
+        int opens = 0, closes = 0;
+        for (int characterIndex = 0; characterIndex < searchString.length(); characterIndex++) {
+            if (searchString.charAt(characterIndex) == '{') {
+                opens++;
+            } else if (searchString.charAt(characterIndex) == '}') {
+                closes++;
+            }
+            if (numOpens + opens - closes == 1) {
+                return characterIndex;
+            }
+        }
+        return -1;
+    }
+
     private void processFragment(int fragmentIndex) {
         try {
             String TAG = "INFO";
-            File fragment = new File(activity.getFilesDir(), fragmentPrefix + fragmentIndex + ".json");
+            File fragment = new File(activity.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fragmentPrefix + fragmentIndex + ".json");
             FileInputStream FIS = new FileInputStream(fragment);
             InputStreamReader ISR = new InputStreamReader(FIS);
             BufferedReader BR = new BufferedReader(ISR);
@@ -477,9 +455,9 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
             BR.close();
             ISR.close();
             FIS.close();
-            fragment.delete();
+//            fragment.delete();
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.d("DEBUG", "processFragment: Exception encountered @ Fragment: " + fragmentIndex);
         }
     }
 

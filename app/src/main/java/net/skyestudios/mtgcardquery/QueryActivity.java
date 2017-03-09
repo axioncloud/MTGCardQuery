@@ -8,6 +8,9 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
+
 public class QueryActivity extends Activity {
 
     @Override
@@ -15,7 +18,7 @@ public class QueryActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_query);
         //<editor-fold desc="WebView Setup">
-        /*final WebView webView = (WebView) findViewById(R.id.webView);
+        final WebView webView = (WebView) findViewById(R.id.webView);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setDomStorageEnabled(true);
         webView.addJavascriptInterface(new HtmlView(), "HtmlView");
@@ -32,12 +35,12 @@ public class QueryActivity extends Activity {
                 }, 500);
             }
         });
-        ((WebView) findViewById(R.id.webView)).loadUrl("http://magiccards.info/query?q=" + "Akroma's+Memorial");*/
+        ((WebView) findViewById(R.id.webView)).loadUrl("http://magiccards.info/query?q=" + "Akroma's+Memorial");
         //</editor-fold>
 
         CardAssetProcesser cardAssetProcesser = new CardAssetProcesser(this);
-        cardAssetProcesser.setForcedUpdate(true);
-        cardAssetProcesser.execute();
+        cardAssetProcesser.setForcedUpdate();
+        cardAssetProcesser.executeOnExecutor(CardAssetProcesser.THREAD_POOL_EXECUTOR);
     }
 
     private class HtmlView {
