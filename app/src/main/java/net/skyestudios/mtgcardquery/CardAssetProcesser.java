@@ -5,6 +5,8 @@ import android.os.AsyncTask;
 import android.util.JsonReader;
 import android.util.Log;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -210,20 +212,26 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
             /////Using that offset start there and repeat until finished
             String bufferString;
 
-            byte[] buffer = new byte[128];
+            byte[] buffer = new byte[1024];
 
             int bufferFragmentSize = (int) (allCardsFileLength / fileFragments);
-            int bufferPaddingSize = buffer.length;
+            int bufferPaddingSize = buffer.length * 2;
 
             int fileCharacterNumber = 0;
 
-            for (int fragmentIndex = 0; fragmentIndex < fileFragments; fragmentIndex++) {
+            String overFlowStrngBuffer = null;
+            FileOutputStream FOS = null;
+            File fragment = null;
+
+            for (int fragmentIndex = 0; fragmentIndex < fileFragments; ) {
                 int numOpens = 0;
                 int bufferSize = 0;
 
-                File fragment = new File(activity.getFilesDir(),
-                        fragmentPrefix + fragmentIndex + ".json");
-                FileOutputStream FOS = new FileOutputStream(fragment);
+                if (overFlowStrngBuffer == null) {
+                    fragment = new File(activity.getFilesDir(),
+                            fragmentPrefix + fragmentIndex + ".json");
+                    FOS = new FileOutputStream(fragment);
+                }
 
                 int minBufferSize = (bufferFragmentSize * (fragmentIndex + 1)) - bufferPaddingSize;
                 int maxBufferSize = (bufferFragmentSize * (fragmentIndex + 1)) + bufferPaddingSize;
@@ -235,18 +243,64 @@ class CardAssetProcesser extends AsyncTask<Void, Void, Void> {
 
                 while ((bufferSize = FIS.read(buffer)) != -1) {
                     bufferString = new String(buffer, "UTF-8");
-                    numOpens += bufferString.split("\\{", -1).length - 1;
-                    String s = bufferString.replaceAll("[^\\{]*($)?", "");
-                    numOpens -= bufferString.split("\\}", -1).length - 1;
-                    if (numOpens == 1 &&
-                            fileCharacterNumber >= minBufferSize &&
+                    int opens = StringUtils.countMatches(bufferString, '{');
+                    int closes = StringUtils.countMatches(bufferString, '{');
+
+                    if (fileCharacterNumber >= minBufferSize &&
                             fileCharacterNumber <= maxBufferSize) {
-                        bufferString = bufferString.substring(fileCharacterNumber, fileCharacterNumber + 1) + bufferString.substring(fileCharacterNumber + 1);
-                        buffer = bufferString.getBytes("UTF-8");
+                        // if a close would make numCloses == 1,
+                        // get that position,
+                        // write data to that close,
+                        // set FOS to next fragment,
+                        // write remaining data after close to end of buffer,
+                        // repeat
+
+                        int close = 0;
+                        for (; close < closes; close++) {
+                            if (numOpens - close == 1) {
+                                break;
+                            }
+                        }
+
+                        if (fragmentIndex < fileFragments - 1) {
+                            String partition0 = bufferString.substring(0, StringUtils.ordinalIndexOf(bufferString, "}", close + 2) + 1) + "}";
+                            FOS.write(partition0.getBytes("UTF-8"));
+                            FOS.flush();
+                            FOS.close();
+
+                            fragment = new File(activity.getFilesDir(),
+                                    fragmentPrefix + ++fragmentIndex + ".json");
+                            FOS = new FileOutputStream(fragment);
+
+                            overFlowStrngBuffer = "{" + bufferString.substring(StringUtils.ordinalIndexOf(bufferString, "}", close + 2) + 2);
+                            FOS.write(overFlowStrngBuffer.getBytes("UTF-8"));
+
+                            fileCharacterNumber += bufferString.length();
+                            break;
+                        } else {
+                            if (fileCharacterNumber > allCardsFileLength) {
+                                bufferString += "}";
+                                FOS.write(bufferString.getBytes("UTF-8"));
+                                FOS.flush();
+                                FOS.close();
+
+                                fileCharacterNumber += bufferString.length();
+                                break;
+                            } else {
+                                numOpens += opens;
+                                numOpens -= closes;
+                                FOS.write(buffer, 0, bufferSize);
+
+                                fileCharacterNumber += bufferString.length();
+                            }
+                        }
+                    } else {
+                        numOpens += opens;
+                        numOpens -= closes;
                         FOS.write(buffer, 0, bufferSize);
-                        break;
+
+                        fileCharacterNumber += bufferSize;
                     }
-                    fileCharacterNumber += bufferSize;
                 }
                 /*for (int fragmentLineNumber = fileCharacterNumber;
                      fragmentLineNumber < allCardsFileLength &&
