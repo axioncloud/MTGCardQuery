@@ -18,6 +18,9 @@ public class QueryActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_query);
 
+        CardImageDownloader CID = new CardImageDownloader("", this);
+        CID.executeOnExecutor(CardImageDownloader.THREAD_POOL_EXECUTOR);
+
         CardAssetProcesser cardAssetProcesser = new CardAssetProcesser(this);
         cardAssetProcesser.setForcedUpdate();
         cardAssetProcesser.executeOnExecutor(CardAssetProcesser.THREAD_POOL_EXECUTOR);
