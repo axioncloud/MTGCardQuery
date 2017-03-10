@@ -17,12 +17,15 @@ import android.widget.Toast;
 
 import org.jsoup.Jsoup;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -64,17 +67,34 @@ public class CardImageDownloader extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
         try {
-            URL url = new URL(Jsoup.parse(html)
-                    .getElementsByTag("img")
-                    .get(1)
-                    .attr("src"));
-            URLConnection connection = url
-                    .openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            drawable = (BitmapDrawable) Drawable.createFromStream(connection.getInputStream(), "Card Image");
+            String url = "http://magiccards.info/query?q=" + "Akroma's+Memorial";
+
+            URL obj = new URL(url);
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+            // optional default is GET
+            con.setRequestMethod("GET");
+
+            //add request header
+            con.setRequestProperty("User-Agent", "Mozilla/5.0");
+
+            int responseCode = con.getResponseCode();
+            System.out.println("\nSending 'GET' request to URL : " + url);
+            System.out.println("Response Code : " + responseCode);
+
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+
+            //Parse Document page (response)
             return null;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }

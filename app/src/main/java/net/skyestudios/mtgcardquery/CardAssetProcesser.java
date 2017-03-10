@@ -20,9 +20,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Locale;
 
 /**
  * Created by arkeonet64 on 3/6/2017.
@@ -44,6 +44,7 @@ class CardAssetProcesser extends AsyncTask<Void, String, Void> {
 
     /**
      * Creates a new asynchronous task. This constructor must be invoked on the UI thread.
+     *
      * @param activity
      */
     public CardAssetProcesser(Activity activity) {
@@ -121,13 +122,13 @@ class CardAssetProcesser extends AsyncTask<Void, String, Void> {
             connection.setDoInput(true);
             connection.connect();
             BufferedInputStream BIS = new BufferedInputStream(connection.getInputStream());
-            File versionFile = new File(activity.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "MTGJSON.version");
+            File versionFile = new File(activity.getFilesDir(), "MTGJSON.version");
             byte[] versionBytes = new byte[512];
             int readBytes = BIS.read(versionBytes);
             String versionID = new String(versionBytes, 0, readBytes, "UTF-8").replace("\"", "");
             if (versionFile.exists() &&
                     !isForcedUpdate) {
-                BufferedInputStream BIS2 = new BufferedInputStream(new FileInputStream(versionFile));
+                BufferedInputStream BIS2 =  new BufferedInputStream(new FileInputStream(versionFile));
                 readBytes = BIS2.read(versionBytes);
                 String currentVersionID = new String(versionBytes, 0, readBytes, "UTF-8").replace("\"", "");
                 if (versionID.equals(currentVersionID)) {
@@ -143,7 +144,7 @@ class CardAssetProcesser extends AsyncTask<Void, String, Void> {
                 }
             } else {
                 versionFile.createNewFile();
-                allCardsFile = new File(activity.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "AllCards.json");
+                allCardsFile = new File(activity.getFilesDir(), "AllCards.json");
                 if (allCardsFile.exists()) {
                     URL allCardsURL = new URL("https://mtgjson.com/json/AllCards-x.json");
                     URLConnection allCardsConnection = allCardsURL
@@ -231,7 +232,7 @@ class CardAssetProcesser extends AsyncTask<Void, String, Void> {
                 int bufferSize = 0;
 
                 if (overFlowStrngBuffer == null) {
-                    fragment = new File(activity.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
+                    fragment = new File(activity.getFilesDir(),
                             fragmentPrefix + fragmentIndex + ".json");
                     BOS = new BufferedOutputStream(new FileOutputStream(fragment));
                 }
@@ -257,7 +258,7 @@ class CardAssetProcesser extends AsyncTask<Void, String, Void> {
                             BOS.flush();
                             BOS.close();
 
-                            fragment = new File(activity.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
+                            fragment = new File(activity.getFilesDir(),
                                     fragmentPrefix + ++fragmentIndex + ".json");
                             BOS = new BufferedOutputStream(new FileOutputStream(fragment));
                             overFlowStrngBuffer = "{" + bufferString.substring(closingIndex + 2);
@@ -313,7 +314,7 @@ class CardAssetProcesser extends AsyncTask<Void, String, Void> {
     private void processFragment(int fragmentIndex) {
         try {
             String TAG = "INFO";
-            File fragment = new File(activity.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fragmentPrefix + fragmentIndex + ".json");
+            File fragment = new File(activity.getFilesDir(), fragmentPrefix + fragmentIndex + ".json");
             FileInputStream FIS = new FileInputStream(fragment);
             InputStreamReader ISR = new InputStreamReader(FIS);
             BufferedReader BR = new BufferedReader(ISR);
