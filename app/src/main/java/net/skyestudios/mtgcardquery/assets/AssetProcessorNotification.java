@@ -1,17 +1,16 @@
-package net.skyestudios.mtgcardquery;
+package net.skyestudios.mtgcardquery.assets;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+
+import net.skyestudios.mtgcardquery.R;
 
 /**
  * Helper class for showing and canceling card asset processor
@@ -20,24 +19,15 @@ import android.support.v4.app.NotificationCompat;
  * This class makes heavy use of the {@link NotificationCompat.Builder} helper
  * class to create notifications in a backward-compatible way.
  */
-public class CardAssetProcessorNotification {
+public class AssetProcessorNotification {
     /**
      * The unique identifier for this type of notification.
      */
-    private static final String NOTIFICATION_TAG = "CardAssetProcessor";
+    private static final String NOTIFICATION_TAG = "AssetProcessor";
 
     /**
      * Shows the notification, or updates a previously shown notification of
      * this type, with the given parameters.
-     * <p>
-     * TODO: Customize this method's arguments to present relevant content in
-     * the notification.
-     * <p>
-     * TODO: Customize the contents of this method to tweak the behavior and
-     * presentation of card asset processor notifications. Make
-     * sure to follow the
-     * <a href="https://developer.android.com/design/patterns/notifications.html">
-     * Notification design guidelines</a> when doing so.
      *
      * @see #cancel(Context)
      */
@@ -46,7 +36,6 @@ public class CardAssetProcessorNotification {
         final Resources res = context.getResources();
 
         // This image is used as the notification's large icon (thumbnail).
-        // TODO: Remove this if your notification has no relevant thumbnail.
         final Bitmap picture = BitmapFactory.decodeResource(res, R.mipmap.ic_launcher);
 
         final String title = "Card Asset Processor";
@@ -63,8 +52,6 @@ public class CardAssetProcessorNotification {
                 .setSmallIcon(R.drawable.ic_stat_card_asset_processor)
                 .setContentTitle(title)
                 .setContentText(String.format("Status: [%s]", status))
-
-                // All fields below this line are optional.
 
                 // Use a default priority (recognized on devices running Android
                 // 4.1 or later)

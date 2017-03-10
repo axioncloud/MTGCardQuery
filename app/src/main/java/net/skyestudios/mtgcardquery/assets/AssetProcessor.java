@@ -1,11 +1,10 @@
-package net.skyestudios.mtgcardquery;
+package net.skyestudios.mtgcardquery.assets;
 
 import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.util.JsonReader;
 import android.util.Log;
 
@@ -20,7 +19,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -28,11 +26,10 @@ import java.net.URLConnection;
  * Created by arkeonet64 on 3/6/2017.
  */
 
-class CardAssetProcesser extends AsyncTask<Void, String, Void> {
+public class AssetProcessor extends AsyncTask<Void, String, Void> {
     private String fragmentPrefix;
     private Activity activity;
     private int fileFragments;
-
     private long elapsedMinutes;
     private long secondsDisplay;
     private long elapsedMillis;
@@ -47,7 +44,7 @@ class CardAssetProcesser extends AsyncTask<Void, String, Void> {
      *
      * @param activity
      */
-    public CardAssetProcesser(Activity activity) {
+    public AssetProcessor(Activity activity) {
         super();
         this.activity = activity;
         this.fragmentPrefix = "JSONfragment_";
@@ -202,10 +199,10 @@ class CardAssetProcesser extends AsyncTask<Void, String, Void> {
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
         if (!isCancelled()) {
-            CardAssetProcessorNotification.notify(activity, String.format("%s \\\\%dm:%ds:%dms//",
+            AssetProcessorNotification.notify(activity, String.format("%s \\\\%dm:%ds:%dms//",
                     "Successful", elapsedMinutes, secondsDisplay, elapsedMillis), 0);
         } else {
-            CardAssetProcessorNotification.notify(activity, String.format("%s \\\\%dm:%ds:%dms//",
+            AssetProcessorNotification.notify(activity, String.format("%s \\\\%dm:%ds:%dms//",
                     "Complete", elapsedMinutes, secondsDisplay, elapsedMillis), 0);
         }
     }

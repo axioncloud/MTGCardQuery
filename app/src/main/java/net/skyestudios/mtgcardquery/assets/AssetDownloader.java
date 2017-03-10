@@ -1,38 +1,19 @@
-package net.skyestudios.mtgcardquery;
+package net.skyestudios.mtgcardquery.assets;
 
 import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.ContentValues;
-import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.Toast;
-
-import org.jsoup.Jsoup;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 
 /**
  * Created by arkeonet64 on 3/6/2017.
  */
-public class CardImageDownloader extends AsyncTask<Void, Void, Void> {
+public class AssetDownloader extends AsyncTask<Void, Void, Void> {
     private String html;
     private BitmapDrawable drawable;
     private Activity activity;
@@ -40,7 +21,7 @@ public class CardImageDownloader extends AsyncTask<Void, Void, Void> {
     /**
      * Creates a new asynchronous task. This constructor must be invoked on the UI thread.
      */
-    public CardImageDownloader(String html, Activity activity) {
+    public AssetDownloader(String html, Activity activity) {
         super();
         this.html = html;
         this.activity = activity;
@@ -79,8 +60,6 @@ public class CardImageDownloader extends AsyncTask<Void, Void, Void> {
             con.setRequestProperty("User-Agent", "Mozilla/5.0");
 
             int responseCode = con.getResponseCode();
-            System.out.println("\nSending 'GET' request to URL : " + url);
-            System.out.println("Response Code : " + responseCode);
 
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(con.getInputStream()));
@@ -115,7 +94,7 @@ public class CardImageDownloader extends AsyncTask<Void, Void, Void> {
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
 
-        ((ImageView) activity.findViewById(R.id.cardImage_ImageView)).setImageDrawable(drawable);
+        /*((ImageView) activity.findViewById(R.id.cardImage_ImageView)).setImageDrawable(drawable);
 
         final File DCIM_Directory = new File(Environment
                 .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
@@ -154,7 +133,6 @@ public class CardImageDownloader extends AsyncTask<Void, Void, Void> {
                 }
                 return false;
             }
-        });
-        CardAssetProcessorNotification.notify(activity, "Complete", 0);
+        });*/
     }
 }
