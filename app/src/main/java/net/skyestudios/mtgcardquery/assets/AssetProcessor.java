@@ -42,7 +42,7 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
     /**
      * Creates a new asynchronous task. This constructor must be invoked on the UI thread.
      *
-     * @param activity
+     * @param activity current Activity running
      */
     public AssetProcessor(Activity activity) {
         super();
