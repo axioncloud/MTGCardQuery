@@ -1,8 +1,46 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Material">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:windowBackground">@color/colorBackground</item>
+        <item name="android:textColorHint">#FFFFFFFF</item>
     </style>
 
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat">
+        <item name="android:textColorHint">#FFFFFFFF</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.Dialog" parent="Theme.AppCompat.Dialog">
+
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="AppTheme.CheckBoxStyle_Green" parent="Theme.AppCompat">
+        <item name="colorAccent">#FF2C972C</item>
+    </style>
+
+    <style name="AppTheme.CheckBoxStyle_Red" parent="Theme.AppCompat">
+        <item name="colorAccent">#FFD21A1A</item>
+    </style>
+
+    <style name="AppTheme.CheckBoxStyle_Black" parent="Theme.AppCompat">
+        <item name="colorAccent">#FF000000</item>
+    </style>
+
+    <style name="AppTheme.CheckBoxStyle_Blue" parent="Theme.AppCompat">
+        <item name="colorAccent">#2c2c97</item>
+    </style>
+
+    <style name="AppTheme.CheckBoxStyle_White" parent="Theme.AppCompat">
+        <item name="colorAccent">#FFFFFFFF</item>
+    </style>
+
+    <style name="AppTheme.CheckBoxStyle_Colorless" parent="Theme.AppCompat">
+        <item name="colorAccent">#FFAAAAAA</item>
+    </style>
 </resources>
