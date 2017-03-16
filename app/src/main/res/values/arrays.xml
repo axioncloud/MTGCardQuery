@@ -1,8 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="drawerListStrings">
-        <item>Search</item>
-        <item>Settings</item>
-        <item>About</item>
-    </string-array>
 </resources>

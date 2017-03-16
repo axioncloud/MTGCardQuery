@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 super.onDrawerClosed(drawerView);
             }
         };
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setCheckedItem(R.id.item_card_search);
         currentDrawerID = R.id.item_card_search;
