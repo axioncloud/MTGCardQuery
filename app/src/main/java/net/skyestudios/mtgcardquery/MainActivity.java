@@ -5,35 +5,33 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.widget.FrameLayout;
 
-import net.skyestudios.mtgcardquery.ui.Fragments.DecksFragment;
-import net.skyestudios.mtgcardquery.ui.Fragments.QueryFragment;
-import net.skyestudios.mtgcardquery.ui.Fragments.SettingsFragment;
-import net.skyestudios.mtgcardquery.ui.Fragments.WishlistFragment;
+import net.skyestudios.mtgcardquery.fragments.DecksFragment;
+import net.skyestudios.mtgcardquery.fragments.QueryFragment;
+import net.skyestudios.mtgcardquery.fragments.SettingsFragment;
+import net.skyestudios.mtgcardquery.fragments.WishlistFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private FrameLayout fragment_container;
     private Toolbar toolbar;
     private DrawerLayout drawer;
     private Fragment fragment;
     private int currentDrawerID;
     private NavigationView navigationView;
-    private android.support.v4.app.FragmentManager fragmentManager;
+    private FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_drawer);
 
-        fragment_container = (FrameLayout) findViewById(R.id.fragment_container);
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -49,7 +47,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (savedInstanceState == null) {
             fragment = new QueryFragment();
             fragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit();
-
 
             navigationView.setCheckedItem(R.id.item_card_search);
             currentDrawerID = R.id.item_card_search;

@@ -1,4 +1,4 @@
-package net.skyestudios.mtgcardquery.ui.Fragments;
+package net.skyestudios.mtgcardquery.fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -70,6 +70,25 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
         cb_blackState = false;
         cb_blueState = false;
         cb_greenState = false;
+
+        if (cb_white != null) {
+            cb_white.setChecked(false);
+        }
+        if (cb_green != null) {
+            cb_green.setChecked(false);
+        }
+        if (cb_red != null) {
+            cb_red.setChecked(false);
+        }
+        if (cb_black != null) {
+            cb_black.setChecked(false);
+        }
+        if (cb_blue != null) {
+            cb_blue.setChecked(false);
+        }
+        if (cb_colorless != null) {
+            cb_colorless.setChecked(false);
+        }
     }
 
     @Override
@@ -95,16 +114,24 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         cb_whiteState = cb_white.isChecked();
-                        cb_redState = cb_white.isChecked();
-                        cb_blueState = cb_white.isChecked();
-                        cb_blackState = cb_white.isChecked();
-                        cb_greenState = cb_white.isChecked();
+                        cb_redState = cb_red.isChecked();
+                        cb_blueState = cb_blue.isChecked();
+                        cb_blackState = cb_black.isChecked();
+                        cb_greenState = cb_green.isChecked();
                         cb_colorlessState = cb_colorless.isChecked();
+                        dialogInterface.dismiss();
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+                        cb_white.setChecked(cb_whiteState);
+                        cb_black.setChecked(cb_blackState);
+                        cb_blue.setChecked(cb_blueState);
+                        cb_green.setChecked(cb_greenState);
+                        cb_colorless.setChecked(cb_colorlessState);
+                        cb_red.setChecked(cb_redState);
+
                         dialogInterface.dismiss();
                     }
                 })
@@ -130,13 +157,6 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
                 if (cb_colorless == null) {
                     cb_colorless = (CheckBox) colorDialog.findViewById(R.id.color_query_colorless);
                 }
-
-                cb_white.setChecked(cb_whiteState);
-                cb_black.setChecked(cb_blackState);
-                cb_blue.setChecked(cb_blueState);
-                cb_green.setChecked(cb_greenState);
-                cb_colorless.setChecked(cb_colorlessState);
-                cb_red.setChecked(cb_redState);
             }
         });
         super.onCreate(savedInstanceState);

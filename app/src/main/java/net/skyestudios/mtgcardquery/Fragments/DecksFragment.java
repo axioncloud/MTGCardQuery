@@ -1,4 +1,4 @@
-package net.skyestudios.mtgcardquery.ui.Fragments;
+package net.skyestudios.mtgcardquery.fragments;
 
 
 import android.os.Bundle;
