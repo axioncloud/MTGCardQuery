@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.TextView;
 
 import net.skyestudios.mtgcardquery.R;
 
@@ -94,20 +93,14 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        TextView title = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             context = getContext();
         } else {
             context = getActivity().getApplicationContext();
         }
-        title = new TextView(context);
-        title.setText("Color Selection");
-        title.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        title.setTextSize(getResources().getDimension(R.dimen.dialog_textsize));
 
         colorDialog = new AlertDialog.Builder(context, R.style.AppTheme_Dialog)
-                .setCustomTitle(title)
-                .setIcon(R.mipmap.ic_launcher)
+                .setTitle("Color Selection")
                 .setView(R.layout.layout_dialog_color)
                 .setCancelable(false)
                 .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
@@ -160,6 +153,12 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
             }
         });
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        colorDialog.dismiss();
     }
 
     @Override

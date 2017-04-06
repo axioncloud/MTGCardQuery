@@ -8,6 +8,9 @@ import android.os.AsyncTask;
 import android.util.JsonReader;
 import android.util.Log;
 
+import net.skyestudios.mtgcardquery.data.Card;
+import net.skyestudios.mtgcardquery.db.MTGCardDataSource;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedInputStream;
@@ -21,12 +24,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 
 /**
  * Created by arkeonet64 on 3/6/2017.
  */
 
 public class AssetProcessor extends AsyncTask<Void, String, Void> {
+    private final MTGCardDataSource mtgCardDataSource;
     private String fragmentPrefix;
     private Activity activity;
     private int fileFragments;
@@ -44,7 +49,7 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
      *
      * @param activity current Activity running
      */
-    public AssetProcessor(Activity activity) {
+    public AssetProcessor(Activity activity, MTGCardDataSource cardDataSource) {
         super();
         this.activity = activity;
         this.fragmentPrefix = "JSONfragment_";
@@ -53,6 +58,7 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
         this.connectivityManager = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
         this.activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         this.isForcedUpdate = false;
+        this.mtgCardDataSource = cardDataSource;
     }
 
     /**
@@ -125,7 +131,7 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
             String versionID = new String(versionBytes, 0, readBytes, "UTF-8").replace("\"", "");
             if (versionFile.exists() &&
                     !isForcedUpdate) {
-                BufferedInputStream BIS2 =  new BufferedInputStream(new FileInputStream(versionFile));
+                BufferedInputStream BIS2 = new BufferedInputStream(new FileInputStream(versionFile));
                 readBytes = BIS2.read(versionBytes);
                 String currentVersionID = new String(versionBytes, 0, readBytes, "UTF-8").replace("\"", "");
                 if (versionID.equals(currentVersionID)) {
@@ -198,12 +204,13 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+        mtgCardDataSource.closeDb();
         if (!isCancelled()) {
             AssetProcessorNotification.notify(activity, String.format("%s \\\\%dm:%ds:%dms//",
                     "Successful", elapsedMinutes, secondsDisplay, elapsedMillis), 0);
         } else {
             AssetProcessorNotification.notify(activity, String.format("%s \\\\%dm:%ds:%dms//",
-                    "Complete", elapsedMinutes, secondsDisplay, elapsedMillis), 0);
+                    "Cancelled", elapsedMinutes, secondsDisplay, elapsedMillis), 0);
         }
     }
 
@@ -320,66 +327,89 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
             while (jreader.hasNext()) {
                 jreader.nextName();                             //Start of Card Object
                 jreader.beginObject();
+                Card card = new Card();
                 while (jreader.hasNext()) {
                     String tagName = jreader.nextName();
                     switch (tagName) {
                         //<editor-fold desc="JSON Property Statements">
-                        case "layout":
-                            jreader.nextString();
-                            break;
                         case "name":
-                            jreader.nextString();
+                            String name = jreader.nextString();
+                            card.setName(name);
+                            break;
+                        case "layout":
+                            String layout = jreader.nextString();
+                            card.setLayout(layout);
                             break;
                         case "manaCost":
-                            jreader.nextString();
+                            String manaCost = jreader.nextString();
+                            card.setManaCost(manaCost);
                             break;
                         case "cmc":
-                            jreader.nextDouble();
+                            Double cmc = jreader.nextDouble();
+                            card.setCmc(cmc);
                             break;
                         case "colors":
+                            ArrayList<String> colors = new ArrayList<>();
                             jreader.beginArray();
                             while (jreader.hasNext()) {
-                                jreader.nextString();
+                                String color = jreader.nextString();
+                                colors.add(color);
                             }
                             jreader.endArray();
+                            card.setColors(colors.toString());
                             break;
                         case "type":
-                            jreader.nextString();
+                            String type = jreader.nextString();
+                            card.setType(type);
                             break;
                         case "types":
+                            ArrayList<String> types = new ArrayList<>();
                             jreader.beginArray();
                             while (jreader.hasNext()) {
-                                jreader.nextString();
+                                String t_type = jreader.nextString();
+                                types.add(t_type);
                             }
                             jreader.endArray();
+                            card.setTypes(types.toString());
                             break;
                         case "subtypes":
+                            ArrayList<String> subtypes = new ArrayList<>();
                             jreader.beginArray();
                             while (jreader.hasNext()) {
-                                jreader.nextString();
+                                String subtype = jreader.nextString();
+                                subtypes.add(subtype);
                             }
                             jreader.endArray();
+                            card.setSubtypes(subtypes.toString());
                             break;
                         case "text":
-                            jreader.nextString();
+                            String text = jreader.nextString();
+                            card.setText(text);
                             break;
                         case "power":
-                            jreader.nextString();
+                            String power = jreader.nextString();
+                            card.setPower(power);
                             break;
                         case "toughness":
-                            jreader.nextString();
+                            String toughness = jreader.nextString();
+                            card.setToughness(toughness);
                             break;
                         case "imageName":
-                            jreader.nextString();
+                            String imageName = jreader.nextString();
+                            card.setImageName(imageName);
                             break;
                         case "printings":
+                            ArrayList<String> printings = new ArrayList<>();
                             jreader.beginArray();
                             while (jreader.hasNext()) {
-                                jreader.nextString();
+                                String printing = jreader.nextString();
+                                printings.add(printing);
                             }
                             jreader.endArray();
+                            card.setPrintings(printings.toString());
                             break;
                         case "legalities":
+                            //TODO: Retreive legalities from complex array
                             jreader.beginArray();
                             while (jreader.hasNext()) {
                                 jreader.beginObject();
@@ -392,13 +422,17 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                             jreader.endArray();
                             break;
                         case "colorIdentity":
+                            ArrayList<String> colorIdentities = new ArrayList<>();
                             jreader.beginArray();
                             while (jreader.hasNext()) {
-                                jreader.nextString();
+                                String colorIdentity = jreader.nextString();
+                                colorIdentities.add(colorIdentity);
                             }
                             jreader.endArray();
+                            card.setColorIdentity(colorIdentities.toString());
                             break;
                         case "rulings":
+                            //TODO: Retreive rulings from complex array
                             jreader.beginArray();
                             while (jreader.hasNext()) {
                                 jreader.beginObject();
@@ -411,33 +445,44 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                             jreader.endArray();
                             break;
                         case "source":
-                            jreader.nextString();
+                            String source = jreader.nextString();
+                            card.setSource(source);
                             break;
                         case "supertypes":
+                            ArrayList<String> supertypes = new ArrayList<>();
                             jreader.beginArray();
                             while (jreader.hasNext()) {
-                                jreader.nextString();
+                                String supertype = jreader.nextString();
+                                supertypes.add(supertype);
                             }
                             jreader.endArray();
+                            card.setSupertypes(supertypes.toString());
                             break;
                         case "starter":
-                            jreader.nextBoolean();
+                            Boolean starter = jreader.nextBoolean();
+                            card.setStarter(starter);
                             break;
                         case "loyalty":
-                            jreader.nextInt();
+                            Integer loyalty = jreader.nextInt();
+                            card.setLoyalty(loyalty);
                             break;
                         case "hand":
-                            jreader.nextInt();
+                            Integer hand = jreader.nextInt();
+                            card.setHand(hand);
                             break;
                         case "life":
-                            jreader.nextInt();
+                            Integer life = jreader.nextInt();
+                            card.setLife(life);
                             break;
                         case "names":
+                            ArrayList<String> names = new ArrayList<>();
                             jreader.beginArray();
                             while (jreader.hasNext()) {
-                                jreader.nextString();
+                                String n_name = jreader.nextString();
+                                names.add(n_name);
                             }
                             jreader.endArray();
+                            card.setNames(names.toString());
                             break;
                         //</editor-fold>
                         default:
@@ -446,6 +491,7 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                             break;
                     }
                 }
+                mtgCardDataSource.createCard(card);
                 jreader.endObject();                            //End of Card Object
             }
             jreader.endObject();                                //End of File Object
@@ -453,10 +499,10 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
             BR.close();
             ISR.close();
             FIS.close();
-//            fragment.delete();
+            fragment.delete();
         } catch (Exception e) {
+            e.printStackTrace();
             Log.d("DEBUG", "processFragment: Exception encountered @ Fragment: " + fragmentIndex);
         }
     }
-
 }

@@ -2,14 +2,12 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "24.0.3"
+    buildToolsVersion '25.0.2'
     defaultConfig {
         applicationId "net.skyestudios.mtgcardquery"
-        minSdkVersion 21
+        minSdkVersion 16
         targetSdkVersion 25
-        versionName 'Alpha - '
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        versionNameSuffix 'Stellar Moon'
     }
     buildTypes {
         release {
@@ -18,6 +16,14 @@ android {
         }
     }
     productFlavors {
+        Alpha {
+            minSdkVersion 16
+            applicationId 'net.skyestudios.mtgcardquery'
+            targetSdkVersion 25
+            testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
+            versionName 'Alpha'
+            versionNameSuffix '-build:' + getBuildVersion()
+        }
     }
 }
 
@@ -30,4 +36,22 @@ dependencies {
     compile 'com.android.support:support-v4:25.3.0'
     compile 'com.android.support:appcompat-v7:25.3.0'
     testCompile 'junit:junit:4.12'
+}
+
+def getBuildVersion() {
+    def versionPropsFile = file("buildnumber.properties")
+    if (versionPropsFile.canRead()) {
+        def Properties versionProps = new Properties()
+
+        versionProps.load(new FileInputStream(versionPropsFile))
+
+        def code = versionProps['VERSION_CODE'].toInteger() + 1
+
+        versionProps['VERSION_CODE'] = code.toString()
+        versionProps.store(versionPropsFile.newWriter(), null)
+
+        code
+    } else {
+        throw new GradleException("Could not read buildnumber.properties")
+    }
 }

@@ -2,6 +2,7 @@ package net.skyestudios.mtgcardquery;
 
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -12,25 +13,32 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import net.skyestudios.mtgcardquery.db.MTGCardDataSource;
 import net.skyestudios.mtgcardquery.fragments.DecksFragment;
 import net.skyestudios.mtgcardquery.fragments.QueryFragment;
 import net.skyestudios.mtgcardquery.fragments.SettingsFragment;
 import net.skyestudios.mtgcardquery.fragments.WishlistFragment;
 
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
+    private Boolean backPressedOnce;
     private Toolbar toolbar;
     private DrawerLayout drawer;
     private Fragment fragment;
     private int currentDrawerID;
     private NavigationView navigationView;
     private FragmentManager fragmentManager;
+    private Toast backPressedToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_drawer);
+
+        backPressedOnce = false;
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -54,6 +62,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             currentDrawerID = savedInstanceState.getInt("currentDrawerId");
             displayFragment();
         }
+
+        MTGCardDataSource mtgCardDataSource = new MTGCardDataSource(getApplicationContext());
+        mtgCardDataSource.openDb();
     }
 
     @Override
@@ -107,8 +118,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onBackPressed() {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START, true);
+        } else if (!backPressedOnce) {
+            backPressedOnce = true;
+            backPressedToast = Toast.makeText(getApplicationContext(), "Press back again to exit", Toast.LENGTH_SHORT);
+            backPressedToast.show();
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    backPressedOnce = false;
+                }
+            }, 2500);
         } else {
-            super.onBackPressed();
+            backPressedToast.cancel();
+            finish();
         }
     }
 }
