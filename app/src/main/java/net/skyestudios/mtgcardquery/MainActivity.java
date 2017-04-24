@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private NavigationView navigationView;
     private FragmentManager fragmentManager;
     private Toast backPressedToast;
+    private Handler handler;
+    private MTGCardDataSource mtgCardDataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,9 +64,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             currentDrawerID = savedInstanceState.getInt("currentDrawerId");
             displayFragment();
         }
-
-        MTGCardDataSource mtgCardDataSource = new MTGCardDataSource(getApplicationContext());
-        mtgCardDataSource.openDb();
     }
 
     @Override
@@ -115,6 +114,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        backPressedOnce = false;
+        handler = new Handler();
+    }
+
+    @Override
     public void onBackPressed() {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START, true);
@@ -122,10 +128,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             backPressedOnce = true;
             backPressedToast = Toast.makeText(getApplicationContext(), "Press back again to exit", Toast.LENGTH_SHORT);
             backPressedToast.show();
-            Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    backPressedToast.cancel();
                     backPressedOnce = false;
                 }
             }, 2500);

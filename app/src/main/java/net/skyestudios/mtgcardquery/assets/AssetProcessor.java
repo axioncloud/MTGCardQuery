@@ -31,7 +31,8 @@ import java.util.ArrayList;
  */
 
 public class AssetProcessor extends AsyncTask<Void, String, Void> {
-    private final MTGCardDataSource mtgCardDataSource;
+    private ArrayList<Card> cards;
+    private MTGCardDataSource mtgCardDataSource;
     private String fragmentPrefix;
     private Activity activity;
     private int fileFragments;
@@ -59,6 +60,7 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
         this.activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         this.isForcedUpdate = false;
         this.mtgCardDataSource = cardDataSource;
+        this.cards = new ArrayList<>();
     }
 
     /**
@@ -97,7 +99,8 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
     @Override
     protected Void doInBackground(Void... params) {
         long initialTime = System.currentTimeMillis();
-
+        mtgCardDataSource = new MTGCardDataSource(activity.getApplicationContext());
+        mtgCardDataSource.openDb();
         if (!isCancelled() && activeNetworkInfo.isConnected()) {
             updateCards();
         }
@@ -108,6 +111,8 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                 processFragment(i);
             }
         }
+
+        mtgCardDataSource.insertCards(cards);
 
         long deltaTime = System.currentTimeMillis() - initialTime;
         elapsedMillis = deltaTime % 1000;
@@ -491,7 +496,7 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                             break;
                     }
                 }
-                mtgCardDataSource.createCard(card);
+                cards.add(card);
                 jreader.endObject();                            //End of Card Object
             }
             jreader.endObject();                                //End of File Object
