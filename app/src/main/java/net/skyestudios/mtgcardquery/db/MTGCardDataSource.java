@@ -13,11 +13,15 @@ import java.util.ArrayList;
  */
 
 public class MTGCardDataSource {
+    private long rowId;
+    private long rowIdIndex;
     private SQLiteDatabase database;
     private MTGCardSQLiteHelper databaseHelper;
 
     public MTGCardDataSource(Context context) {
         databaseHelper = new MTGCardSQLiteHelper(context);
+        rowIdIndex = 1;
+        rowId = 0;
     }
 
     public void openDb() {
@@ -55,7 +59,14 @@ public class MTGCardDataSource {
         values.put(MTGCardSQLiteHelper.CardColumns.life.toString(), card.getLife());
         values.put(MTGCardSQLiteHelper.CardColumns.names.toString(), card.getNames());
 
-        database.insert(MTGCardSQLiteHelper.TABLE_NAME, null, values);
+        rowId = database.insert(MTGCardSQLiteHelper.MAIN_TABLE_NAME, null, values);
+
+        if (rowId % (rowIdIndex * 60000) == 0) {
+            database.execSQL("INSERT INTO " + MTGCardSQLiteHelper.MAIN_TABLE_NAME + " FROM " + MTGCardSQLiteHelper.STAGING_TABLE_NAME + ";");
+            database.execSQL("DROP TABLE " + MTGCardSQLiteHelper.STAGING_TABLE_NAME + ";");
+            database.execSQL(MTGCardSQLiteHelper.createStagingTableString());
+            rowIdIndex++;
+        }
     }
 
     public void insertCards(ArrayList<Card> cards) {
@@ -87,6 +98,15 @@ public class MTGCardDataSource {
             values.put(MTGCardSQLiteHelper.CardColumns.life.toString(), card.getLife());
             values.put(MTGCardSQLiteHelper.CardColumns.names.toString(), card.getNames());
         }
-        database.insert(MTGCardSQLiteHelper.TABLE_NAME, null, values);
+
+        rowId = database.insert(MTGCardSQLiteHelper.MAIN_TABLE_NAME, null, values);
+
+        //TODO: Nate - Finish staging table to main table
+        if (rowId % (rowIdIndex * 60000) == 0) {
+            database.execSQL("INSERT INTO " + MTGCardSQLiteHelper.MAIN_TABLE_NAME + " FROM " + MTGCardSQLiteHelper.STAGING_TABLE_NAME + ";");
+            database.execSQL("DROP TABLE " + MTGCardSQLiteHelper.STAGING_TABLE_NAME + ";");
+            database.execSQL(MTGCardSQLiteHelper.createStagingTableString());
+            rowIdIndex++;
+        }
     }
 }
