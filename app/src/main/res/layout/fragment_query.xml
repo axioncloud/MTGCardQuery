@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
+    <!-- TODO: Dimitrei - Finish query layout completely to allow users to create queries -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">

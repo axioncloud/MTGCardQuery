@@ -414,7 +414,7 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                             card.setPrintings(printings.toString());
                             break;
                         case "legalities":
-                            //TODO: Retreive legalities from complex array
+                            //TODO: Nate - Retreive legalities from complex array
                             jreader.beginArray();
                             while (jreader.hasNext()) {
                                 jreader.beginObject();
@@ -437,7 +437,7 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                             card.setColorIdentity(colorIdentities.toString());
                             break;
                         case "rulings":
-                            //TODO: Retreive rulings from complex array
+                            //TODO: Nate - Retreive rulings from complex array
                             jreader.beginArray();
                             while (jreader.hasNext()) {
                                 jreader.beginObject();
