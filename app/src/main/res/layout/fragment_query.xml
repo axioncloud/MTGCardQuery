@@ -48,6 +48,128 @@
                     android:text="Select Color Identity" />
             </LinearLayout>
 
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <EditText
+                    android:layout_width="182dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapWords|textAutoCorrect|textPersonName"
+                    android:ems="10"
+                    android:textSize="24sp"
+                    android:id="@+id/super_type_text"
+                    android:hint="(Super)Type" />
+
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapWords|textAutoCorrect|textPersonName"
+                    android:ems="10"
+                    android:id="@+id/subtype_text"
+                    android:layout_weight="1"
+                    android:textSize="24sp"
+                    android:hint="SubType" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapWords|textAutoCorrect|textPersonName"
+                    android:ems="10"
+                    android:id="@+id/text_text"
+                    android:layout_weight="1"
+                    android:hint="Text"
+                    android:textSize="24sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:weightSum="1">
+
+                <TextView
+                    android:text="Power"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/power_view"
+                    android:textSize="24sp"
+                    android:layout_weight="0.23" />
+
+                <Spinner
+                    android:layout_width="25dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/power_spinner"
+                    android:layout_weight="0.78" />
+
+                <Spinner
+                    android:layout_width="154dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/power_number_spinner"
+                    android:layout_weight="0.01" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:weightSum="1">
+
+                <TextView
+                    android:text="Toughness"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/toughness_view"
+                    android:textSize="24sp" />
+
+                <Spinner
+                    android:layout_width="113dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tough_spinner" />
+
+                <Spinner
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tough_number_spinner"
+                    android:layout_width="154dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:weightSum="1">
+
+                <TextView
+                    android:text="CMC"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/cmc_view"
+                    android:textSize="24sp" />
+
+                <Spinner
+                    android:layout_width="179dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/cmc_spinner"
+                    android:layout_weight="0.01" />
+
+                <Spinner
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/cmc_number_spinner"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 
