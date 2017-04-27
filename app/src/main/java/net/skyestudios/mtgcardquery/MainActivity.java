@@ -22,6 +22,9 @@ import net.skyestudios.mtgcardquery.fragments.QueryFragment;
 import net.skyestudios.mtgcardquery.fragments.SettingsFragment;
 import net.skyestudios.mtgcardquery.fragments.WishlistFragment;
 
+import java.io.File;
+import java.io.IOException;
+
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -42,8 +45,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_drawer);
 
-        //New settings or load from file
-        settings = new Settings(getApplicationContext());
+        File settingsFile = new File(getFilesDir(), "settings.bin");
+
+        try {
+            //If the file does not exist, create file and return true
+            if (settingsFile.createNewFile()) {
+                settings = new Settings(getApplicationContext());
+                settings.save(settingsFile);
+                settings.getAssetProcessor().execute();
+            } else {
+                settings = Settings.load(settingsFile);
+                settings.setApplicationContext(getApplicationContext());
+                settings.recreateAssetProcessor();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        handler = new Handler();
 
         backPressedOnce = false;
 
@@ -74,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onStop() {
         super.onStop();
-        mtgCardDataSource.closeDb();
+        settings.getMtgCardDataSource().closeDb();
     }
 
     @Override
@@ -108,6 +127,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.item_settings:
                 toolbar.setTitle(getString(R.string.app_name) + ": Settings");
                 fragment = new SettingsFragment();
+                Bundle args = new Bundle();
+                args.putSerializable("settings", settings);
+                fragment.setArguments(args);
                 fragmentManager.beginTransaction().addToBackStack(null).replace(R.id.fragment_container, fragment).commit();
                 break;
             case R.id.item_decks:
@@ -128,7 +150,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
         backPressedOnce = false;
-        handler = new Handler();
         if (!settings.isDatabaseOpened()) {
             settings.openDb(getApplicationContext());
         }

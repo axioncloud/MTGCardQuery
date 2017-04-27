@@ -9,8 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.skyestudios.mtgcardquery.R;
-import net.skyestudios.mtgcardquery.assets.AssetProcessor;
-import net.skyestudios.mtgcardquery.db.MTGCardDataSource;
+import net.skyestudios.mtgcardquery.data.Settings;
 
 
 /**
@@ -18,8 +17,7 @@ import net.skyestudios.mtgcardquery.db.MTGCardDataSource;
  */
 public class SettingsFragment extends Fragment implements View.OnClickListener {
 
-    AssetProcessor assetProcessor;
-    MTGCardDataSource mtgCardDataSource;
+    private Settings settings;
 
     public SettingsFragment() {
         // Required empty public constructor
@@ -28,24 +26,30 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        settings = (Settings) getArguments().getSerializable("settings");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        mtgCardDataSource = new MTGCardDataSource(getContext());
-        assetProcessor = new AssetProcessor(getActivity(), mtgCardDataSource);
-        assetProcessor.setForcedUpdate();
-        return inflater.inflate(R.layout.fragment_settings, container, false);
+        View view = inflater.inflate(R.layout.fragment_settings, container, false);
+        view.findViewById(R.id.button_forceupdate).setOnClickListener(this);
+        view.findViewById(R.id.button_update).setOnClickListener(this);
+        return view;
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.force_updateButton:
-                assetProcessor.execute();
+            case R.id.button_forceupdate:
+                settings.recreateAssetProcessor();
+                settings.getAssetProcessor().setForcedUpdate();
+                settings.getAssetProcessor().execute();
                 break;
+            case R.id.button_update:
+                settings.recreateAssetProcessor();
+                settings.getAssetProcessor().execute();
         }
     }
 }

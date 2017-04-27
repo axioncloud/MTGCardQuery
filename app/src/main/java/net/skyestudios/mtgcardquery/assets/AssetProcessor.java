@@ -40,9 +40,6 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
     private String fragmentPrefix;
     private Context context;
     private int fileFragments;
-    private long elapsedMinutes;
-    private long secondsDisplay;
-    private long elapsedMillis;
     private File allCardsFile;
     private Boolean isForcedUpdate;
     private long allCardsFileLength;
@@ -104,7 +101,6 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
     @Override
     protected Void doInBackground(Void... params) {
 
-        long initialTime = System.currentTimeMillis();
         if (!isCancelled() && activeNetworkInfo.isConnected()) {
             updateCards();
         }
@@ -115,12 +111,6 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                 processFragment(i);
             }
         }
-
-        long deltaTime = System.currentTimeMillis() - initialTime;
-        elapsedMillis = deltaTime % 1000;
-        long elapsedSeconds = deltaTime / 1000;
-        secondsDisplay = elapsedSeconds % 60;
-        elapsedMinutes = elapsedSeconds / 60;
         return null;
     }
 
@@ -128,10 +118,10 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
         try {
             if (!isCancelled()) {
                 AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
-                        "Downloading Update"), 0);
+                        "Checking Version"), 0);
             } else {
-                AssetProcessorNotification.notify(context, String.format(Locale.US, "%s \\\\%dm:%ds:%dms//",
-                        "Cancelled", elapsedMinutes, secondsDisplay, elapsedMillis), 0);
+                AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
+                        "Cancelled"), 0);
             }
             URL url = new URL("https://mtgjson.com/json/version.json");
             URLConnection connection = url
@@ -151,10 +141,18 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                 if (versionID.equals(currentVersionID)) {
                     BIS.close();
                     BIS2.close();
+                    if (!isCancelled()) {
+                        AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
+                                "Successful"), 0);
+                    } else {
+                        AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
+                                "Cancelled"), 0);
+                    }
                     cancel(false);
                 } else {
                     BIS.close();
                     BIS2.close();
+                    downloadUpdate(versionFile, versionID);
                     BufferedOutputStream BOS = new BufferedOutputStream(new FileOutputStream(versionFile));
                     BOS.write(versionID.getBytes("UTF-8"));
                     BOS.close();
@@ -163,46 +161,57 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                 mtgCardDataSource.execRAWSQL("DELETE FROM " + MTGCardSQLiteHelper.MAIN_TABLE_NAME + ";");
                 mtgCardDataSource.execRAWSQL("DELETE FROM " + MTGCardSQLiteHelper.STAGING_TABLE_NAME + ";");
                 versionFile.createNewFile();
-                allCardsFile = new File(context.getFilesDir(), "AllCards.json");
-                if (allCardsFile.exists()) {
-                    URL allCardsURL = new URL("https://mtgjson.com/json/AllCards-x.json");
-                    URLConnection allCardsConnection = allCardsURL
-                            .openConnection();
-                    allCardsConnection.connect();
-                    BufferedOutputStream BOS = new BufferedOutputStream(new FileOutputStream(allCardsFile));
-                    InputStream IS = allCardsConnection.getInputStream();
-                    byte[] buffer = new byte[2048];
-                    int bufferSize;
-                    while ((bufferSize = IS.read(buffer)) != -1) {
-                        BOS.write(buffer, 0, bufferSize);
-                        allCardsFileLength += bufferSize;
-                    }
-                    IS.close();
-                    BOS.close();
-                } else {
-                    allCardsFile.createNewFile();
-                    URL allCardsURL = new URL("https://mtgjson.com/json/AllCards-x.json");
-                    URLConnection allCardsConnection = allCardsURL
-                            .openConnection();
-                    allCardsConnection.connect();
-                    BufferedOutputStream BOS = new BufferedOutputStream(new FileOutputStream(allCardsFile));
-                    InputStream IS = allCardsConnection.getInputStream();
-                    byte[] buffer = new byte[2048];
-                    int bufferSize;
-                    while ((bufferSize = IS.read(buffer)) != -1) {
-                        BOS.write(buffer, 0, bufferSize);
-                        allCardsFileLength += bufferSize;
-                    }
-                    IS.close();
-                    BOS.close();
-                    BOS = new BufferedOutputStream(new FileOutputStream(versionFile));
-                    BOS.write(versionID.getBytes("UTF-8"));
-                    BOS.close();
-                }
+                downloadUpdate(versionFile, versionID);
                 isForcedUpdate = false;
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void downloadUpdate(File versionFile, String versionID) throws IOException {
+        if (!isCancelled()) {
+            AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
+                    "Downloading Update"), 0);
+        } else {
+            AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
+                    "Cancelled"), 0);
+        }
+        allCardsFile = new File(context.getFilesDir(), "AllCards.json");
+        if (allCardsFile.exists()) {
+            URL allCardsURL = new URL("https://mtgjson.com/json/AllCards-x.json");
+            URLConnection allCardsConnection = allCardsURL
+                    .openConnection();
+            allCardsConnection.connect();
+            BufferedOutputStream BOS = new BufferedOutputStream(new FileOutputStream(allCardsFile));
+            InputStream IS = allCardsConnection.getInputStream();
+            byte[] buffer = new byte[2048];
+            int bufferSize;
+            while ((bufferSize = IS.read(buffer)) != -1) {
+                BOS.write(buffer, 0, bufferSize);
+                allCardsFileLength += bufferSize;
+            }
+            IS.close();
+            BOS.close();
+        } else {
+            allCardsFile.createNewFile();
+            URL allCardsURL = new URL("https://mtgjson.com/json/AllCards-x.json");
+            URLConnection allCardsConnection = allCardsURL
+                    .openConnection();
+            allCardsConnection.connect();
+            BufferedOutputStream BOS = new BufferedOutputStream(new FileOutputStream(allCardsFile));
+            InputStream IS = allCardsConnection.getInputStream();
+            byte[] buffer = new byte[2048];
+            int bufferSize;
+            while ((bufferSize = IS.read(buffer)) != -1) {
+                BOS.write(buffer, 0, bufferSize);
+                allCardsFileLength += bufferSize;
+            }
+            IS.close();
+            BOS.close();
+            BOS = new BufferedOutputStream(new FileOutputStream(versionFile));
+            BOS.write(versionID.getBytes("UTF-8"));
+            BOS.close();
         }
     }
 
@@ -222,11 +231,11 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
         super.onPostExecute(aVoid);
         running = false;
         if (!isCancelled()) {
-            AssetProcessorNotification.notify(context, String.format(Locale.US, "%s \\\\%dm:%ds:%dms//",
-                    "Successful", elapsedMinutes, secondsDisplay, elapsedMillis), 0);
+            AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
+                    "Successful"), 0);
         } else {
-            AssetProcessorNotification.notify(context, String.format(Locale.US, "%s \\\\%dm:%ds:%dms//",
-                    "Cancelled", elapsedMinutes, secondsDisplay, elapsedMillis), 0);
+            AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
+                    "Cancelled"), 0);
         }
         try {
             File backupDB = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Database.sqlite");
@@ -249,8 +258,8 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                 AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
                         "Fragmenting"), 0);
             } else {
-                AssetProcessorNotification.notify(context, String.format(Locale.US, "%s \\\\%dm:%ds:%dms//",
-                        "Cancelled", elapsedMinutes, secondsDisplay, elapsedMillis), 0);
+                AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
+                        "Cancelled"), 0);
             }
             BufferedInputStream FIS = new BufferedInputStream(new FileInputStream(allCardsFile));
 
@@ -358,8 +367,8 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                 AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
                         "Inserting Cards"), 0);
             } else {
-                AssetProcessorNotification.notify(context, String.format(Locale.US, "%s \\\\%dm:%ds:%dms//",
-                        "Cancelled", elapsedMinutes, secondsDisplay, elapsedMillis), 0);
+                AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
+                        "Cancelled"), 0);
             }
             String TAG = "INFO";
             File fragment = new File(context.getFilesDir(), fragmentPrefix + fragmentIndex + ".json");

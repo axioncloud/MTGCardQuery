@@ -50,12 +50,27 @@
                         android:text="Never" />
 
                     <Button
-                        android:id="@+id/force_updateButton"
+                        android:id="@+id/button_update"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Force Update" />
+                        android:text="Update" />
+
                 </LinearLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <Button
+                        android:id="@+id/button_forceupdate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_weight="1"
+                        android:text="Force Update" />
+                </RelativeLayout>
             </LinearLayout>
 
         </LinearLayout>
