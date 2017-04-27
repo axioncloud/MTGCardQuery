@@ -17,10 +17,10 @@ import android.widget.Toast;
 
 import net.skyestudios.mtgcardquery.data.Settings;
 import net.skyestudios.mtgcardquery.db.MTGCardDataSource;
-import net.skyestudios.mtgcardquery.frags.DecksFragment;
-import net.skyestudios.mtgcardquery.frags.QueryFragment;
-import net.skyestudios.mtgcardquery.frags.SettingsFragment;
-import net.skyestudios.mtgcardquery.frags.WishlistFragment;
+import net.skyestudios.mtgcardquery.fragments.DecksFragment;
+import net.skyestudios.mtgcardquery.fragments.QueryFragment;
+import net.skyestudios.mtgcardquery.fragments.SettingsFragment;
+import net.skyestudios.mtgcardquery.fragments.WishlistFragment;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
