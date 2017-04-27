@@ -1,15 +1,16 @@
 package net.skyestudios.mtgcardquery.assets;
 
-import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.util.JsonReader;
 import android.util.Log;
 
 import net.skyestudios.mtgcardquery.data.Card;
 import net.skyestudios.mtgcardquery.db.MTGCardDataSource;
+import net.skyestudios.mtgcardquery.db.MTGCardSQLiteHelper;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -24,17 +25,20 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Locale;
 
 /**
  * Created by arkeonet64 on 3/6/2017.
  */
 
 public class AssetProcessor extends AsyncTask<Void, String, Void> {
-    private ArrayList<Card> cards;
+    private Boolean running;
     private MTGCardDataSource mtgCardDataSource;
     private String fragmentPrefix;
-    private Activity activity;
+    private Context context;
     private int fileFragments;
     private long elapsedMinutes;
     private long secondsDisplay;
@@ -48,19 +52,19 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
     /**
      * Creates a new asynchronous task. This constructor must be invoked on the UI thread.
      *
-     * @param activity current Activity running
+     * @param context current Activity running
      */
-    public AssetProcessor(Activity activity, MTGCardDataSource cardDataSource) {
+    public AssetProcessor(Context context, MTGCardDataSource cardDataSource) {
         super();
-        this.activity = activity;
+        this.context = context;
         this.fragmentPrefix = "JSONfragment_";
         this.fileFragments = 12;
         this.allCardsFileLength = 0;
-        this.connectivityManager = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        this.connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         this.activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         this.isForcedUpdate = false;
+        this.running = false;
         this.mtgCardDataSource = cardDataSource;
-        this.cards = new ArrayList<>();
     }
 
     /**
@@ -79,7 +83,8 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-
+        running = true;
+        mtgCardDataSource.resetRowIdIndex();
     }
 
     /**
@@ -98,9 +103,8 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
      */
     @Override
     protected Void doInBackground(Void... params) {
+
         long initialTime = System.currentTimeMillis();
-        mtgCardDataSource = new MTGCardDataSource(activity.getApplicationContext());
-        mtgCardDataSource.openDb();
         if (!isCancelled() && activeNetworkInfo.isConnected()) {
             updateCards();
         }
@@ -112,8 +116,6 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
             }
         }
 
-        mtgCardDataSource.insertCards(cards);
-
         long deltaTime = System.currentTimeMillis() - initialTime;
         elapsedMillis = deltaTime % 1000;
         long elapsedSeconds = deltaTime / 1000;
@@ -124,13 +126,20 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
 
     private void updateCards() {
         try {
+            if (!isCancelled()) {
+                AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
+                        "Downloading Update"), 0);
+            } else {
+                AssetProcessorNotification.notify(context, String.format(Locale.US, "%s \\\\%dm:%ds:%dms//",
+                        "Cancelled", elapsedMinutes, secondsDisplay, elapsedMillis), 0);
+            }
             URL url = new URL("https://mtgjson.com/json/version.json");
             URLConnection connection = url
                     .openConnection();
             connection.setDoInput(true);
             connection.connect();
             BufferedInputStream BIS = new BufferedInputStream(connection.getInputStream());
-            File versionFile = new File(activity.getFilesDir(), "MTGJSON.version");
+            File versionFile = new File(context.getFilesDir(), "MTGJSON.version");
             byte[] versionBytes = new byte[512];
             int readBytes = BIS.read(versionBytes);
             String versionID = new String(versionBytes, 0, readBytes, "UTF-8").replace("\"", "");
@@ -151,8 +160,10 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                     BOS.close();
                 }
             } else {
+                mtgCardDataSource.execRAWSQL("DELETE FROM " + MTGCardSQLiteHelper.MAIN_TABLE_NAME + ";");
+                mtgCardDataSource.execRAWSQL("DELETE FROM " + MTGCardSQLiteHelper.STAGING_TABLE_NAME + ";");
                 versionFile.createNewFile();
-                allCardsFile = new File(activity.getFilesDir(), "AllCards.json");
+                allCardsFile = new File(context.getFilesDir(), "AllCards.json");
                 if (allCardsFile.exists()) {
                     URL allCardsURL = new URL("https://mtgjson.com/json/AllCards-x.json");
                     URLConnection allCardsConnection = allCardsURL
@@ -209,18 +220,38 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        mtgCardDataSource.closeDb();
+        running = false;
         if (!isCancelled()) {
-            AssetProcessorNotification.notify(activity, String.format("%s \\\\%dm:%ds:%dms//",
+            AssetProcessorNotification.notify(context, String.format(Locale.US, "%s \\\\%dm:%ds:%dms//",
                     "Successful", elapsedMinutes, secondsDisplay, elapsedMillis), 0);
         } else {
-            AssetProcessorNotification.notify(activity, String.format("%s \\\\%dm:%ds:%dms//",
+            AssetProcessorNotification.notify(context, String.format(Locale.US, "%s \\\\%dm:%ds:%dms//",
                     "Cancelled", elapsedMinutes, secondsDisplay, elapsedMillis), 0);
+        }
+        try {
+            File backupDB = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Database.sqlite");
+            File currentDB = context.getDatabasePath(MTGCardSQLiteHelper.DB_NAME);
+            if (currentDB.exists()) {
+                FileChannel src = new FileInputStream(currentDB).getChannel();
+                FileChannel dst = new FileOutputStream(backupDB).getChannel();
+                dst.transferFrom(src, 0, src.size());
+                src.close();
+                dst.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     private void fragmentJSON() {
         try {
+            if (!isCancelled()) {
+                AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
+                        "Fragmenting"), 0);
+            } else {
+                AssetProcessorNotification.notify(context, String.format(Locale.US, "%s \\\\%dm:%ds:%dms//",
+                        "Cancelled", elapsedMinutes, secondsDisplay, elapsedMillis), 0);
+            }
             BufferedInputStream FIS = new BufferedInputStream(new FileInputStream(allCardsFile));
 
             String bufferString;
@@ -241,7 +272,7 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                 int bufferSize = 0;
 
                 if (overFlowStrngBuffer == null) {
-                    fragment = new File(activity.getFilesDir(),
+                    fragment = new File(context.getFilesDir(),
                             fragmentPrefix + fragmentIndex + ".json");
                     BOS = new BufferedOutputStream(new FileOutputStream(fragment));
                 }
@@ -267,13 +298,12 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                             BOS.flush();
                             BOS.close();
 
-                            fragment = new File(activity.getFilesDir(),
+                            fragment = new File(context.getFilesDir(),
                                     fragmentPrefix + ++fragmentIndex + ".json");
                             BOS = new BufferedOutputStream(new FileOutputStream(fragment));
                             overFlowStrngBuffer = "{" + bufferString.substring(closingIndex + 2);
 
                             BOS.write(overFlowStrngBuffer.getBytes("UTF-8"));
-
                             fileCharacterNumber += bufferSize;
 
                             numOpens = StringUtils.countMatches(overFlowStrngBuffer, "{") -
@@ -321,9 +351,18 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
     }
 
     private void processFragment(int fragmentIndex) {
+        mtgCardDataSource.beginTransaction();
+        Card card;
         try {
+            if (!isCancelled()) {
+                AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
+                        "Inserting Cards"), 0);
+            } else {
+                AssetProcessorNotification.notify(context, String.format(Locale.US, "%s \\\\%dm:%ds:%dms//",
+                        "Cancelled", elapsedMinutes, secondsDisplay, elapsedMillis), 0);
+            }
             String TAG = "INFO";
-            File fragment = new File(activity.getFilesDir(), fragmentPrefix + fragmentIndex + ".json");
+            File fragment = new File(context.getFilesDir(), fragmentPrefix + fragmentIndex + ".json");
             FileInputStream FIS = new FileInputStream(fragment);
             InputStreamReader ISR = new InputStreamReader(FIS);
             BufferedReader BR = new BufferedReader(ISR);
@@ -332,7 +371,7 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
             while (jreader.hasNext()) {
                 jreader.nextName();                             //Start of Card Object
                 jreader.beginObject();
-                Card card = new Card();
+                card = new Card();
                 while (jreader.hasNext()) {
                     String tagName = jreader.nextName();
                     switch (tagName) {
@@ -361,7 +400,7 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                                 colors.add(color);
                             }
                             jreader.endArray();
-                            card.setColors(colors.toString());
+                            card.setColors(Arrays.toString(colors.toArray()));
                             break;
                         case "type":
                             String type = jreader.nextString();
@@ -375,7 +414,7 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                                 types.add(t_type);
                             }
                             jreader.endArray();
-                            card.setTypes(types.toString());
+                            card.setTypes(Arrays.toString(types.toArray()));
                             break;
                         case "subtypes":
                             ArrayList<String> subtypes = new ArrayList<>();
@@ -385,7 +424,7 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                                 subtypes.add(subtype);
                             }
                             jreader.endArray();
-                            card.setSubtypes(subtypes.toString());
+                            card.setSubtypes(Arrays.toString(subtypes.toArray()));
                             break;
                         case "text":
                             String text = jreader.nextString();
@@ -411,20 +450,24 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                                 printings.add(printing);
                             }
                             jreader.endArray();
-                            card.setPrintings(printings.toString());
+                            card.setPrintings(Arrays.toString(printings.toArray()));
                             break;
                         case "legalities":
-                            //TODO: Nate - Retreive legalities from complex array
+                            ArrayList<String> legalities = new ArrayList<>();
                             jreader.beginArray();
                             while (jreader.hasNext()) {
                                 jreader.beginObject();
                                 while (jreader.hasNext()) {
-                                    tagName = jreader.nextName();
-                                    jreader.nextString();
+                                    jreader.nextName();
+                                    String format = jreader.nextString();
+                                    jreader.nextName();
+                                    String legality = jreader.nextString();
+                                    legalities.add(format + ": " + legality);
                                 }
                                 jreader.endObject();
                             }
                             jreader.endArray();
+                            card.setLegalities(Arrays.toString(legalities.toArray()));
                             break;
                         case "colorIdentity":
                             ArrayList<String> colorIdentities = new ArrayList<>();
@@ -434,20 +477,24 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                                 colorIdentities.add(colorIdentity);
                             }
                             jreader.endArray();
-                            card.setColorIdentity(colorIdentities.toString());
+                            card.setColorIdentity(Arrays.toString(colorIdentities.toArray()));
                             break;
                         case "rulings":
-                            //TODO: Nate - Retreive rulings from complex array
+                            ArrayList<String> rulings = new ArrayList<>();
                             jreader.beginArray();
                             while (jreader.hasNext()) {
                                 jreader.beginObject();
                                 while (jreader.hasNext()) {
-                                    tagName = jreader.nextName();
-                                    jreader.nextString();
+                                    jreader.nextName();
+                                    String date = jreader.nextString();
+                                    jreader.nextName();
+                                    String ruling = jreader.nextString();
+                                    rulings.add(date + ": " + ruling);
                                 }
                                 jreader.endObject();
                             }
                             jreader.endArray();
+                            card.setRulings(Arrays.toString(rulings.toArray()));
                             break;
                         case "source":
                             String source = jreader.nextString();
@@ -461,15 +508,20 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                                 supertypes.add(supertype);
                             }
                             jreader.endArray();
-                            card.setSupertypes(supertypes.toString());
+                            card.setSupertypes(Arrays.toString(supertypes.toArray()));
                             break;
                         case "starter":
                             Boolean starter = jreader.nextBoolean();
                             card.setStarter(starter);
                             break;
                         case "loyalty":
-                            Integer loyalty = jreader.nextInt();
-                            card.setLoyalty(loyalty);
+                            try {
+                                Integer loyalty = jreader.nextInt();
+                                card.setLoyalty(loyalty);
+                            } catch (IllegalStateException e) {
+                                jreader.nextNull();
+                                card.setLoyalty(null);
+                            }
                             break;
                         case "hand":
                             Integer hand = jreader.nextInt();
@@ -487,7 +539,7 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                                 names.add(n_name);
                             }
                             jreader.endArray();
-                            card.setNames(names.toString());
+                            card.setNames(Arrays.toString(names.toArray()));
                             break;
                         //</editor-fold>
                         default:
@@ -496,7 +548,7 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                             break;
                     }
                 }
-                cards.add(card);
+                mtgCardDataSource.insertCard(card);
                 jreader.endObject();                            //End of Card Object
             }
             jreader.endObject();                                //End of File Object
@@ -509,5 +561,16 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
             e.printStackTrace();
             Log.d("DEBUG", "processFragment: Exception encountered @ Fragment: " + fragmentIndex);
         }
+        mtgCardDataSource.setTransactionSuccessful();
+        mtgCardDataSource.endTransaction();
+
+        mtgCardDataSource.beginTransaction();
+        mtgCardDataSource.dumpStagingTable();
+        mtgCardDataSource.setTransactionSuccessful();
+        mtgCardDataSource.endTransaction();
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 }

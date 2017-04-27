@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import net.skyestudios.mtgcardquery.data.Settings;
 import net.skyestudios.mtgcardquery.db.MTGCardDataSource;
 import net.skyestudios.mtgcardquery.fragments.DecksFragment;
 import net.skyestudios.mtgcardquery.fragments.QueryFragment;
@@ -24,6 +25,7 @@ import net.skyestudios.mtgcardquery.fragments.WishlistFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
+    private Settings settings;
     private Boolean backPressedOnce;
     private Toolbar toolbar;
     private DrawerLayout drawer;
@@ -39,6 +41,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_drawer);
+
+        //New settings or load from file
+        settings = new Settings(getApplicationContext());
 
         backPressedOnce = false;
 
@@ -64,6 +69,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             currentDrawerID = savedInstanceState.getInt("currentDrawerId");
             displayFragment();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mtgCardDataSource.closeDb();
     }
 
     @Override
@@ -118,6 +129,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onResume();
         backPressedOnce = false;
         handler = new Handler();
+        if (!settings.isDatabaseOpened()) {
+            settings.openDb(getApplicationContext());
+        }
     }
 
     @Override

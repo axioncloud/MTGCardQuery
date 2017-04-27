@@ -12,12 +12,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.Spinner;
 
 import net.skyestudios.mtgcardquery.R;
+import net.skyestudios.mtgcardquery.db.MTGCardDataSource;
 
 /**
  * Created by arkeonet64 on 3/14/2017.
@@ -44,14 +43,9 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_query, container, false);
-
-        /*Spinner spinner = (Spinner) spinner.findViewById(R.id.power_spinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.spinner_array, android.R.layout.simple_spinner_item);
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);*/
+        View view = inflater.inflate(R.layout.fragment_query, container, false);
+        view.findViewById(R.id.button_query).setOnClickListener(this);
+        return view;
     }
 
     @Override
@@ -172,9 +166,9 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onResume() {
-        openColorDialog = (Button) getActivity().findViewById(R.id.openColorDialog);
+        openColorDialog = (Button) getActivity().findViewById(R.id.button_openColorDialog);
         openColorDialog.setOnClickListener(this);
-        openColorIdentityDialog = (Button) getActivity().findViewById(R.id.openColorIdentityDialog);
+        openColorIdentityDialog = (Button) getActivity().findViewById(R.id.button_openColorIdentityDialog);
         openColorIdentityDialog.setOnClickListener(this);
         super.onResume();
     }
@@ -182,10 +176,13 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.openColorDialog:
+            case R.id.button_openColorDialog:
                 colorDialog.show();
                 break;
-            case R.id.openColorIdentityDialog:
+            case R.id.button_openColorIdentityDialog:
+                break;
+            case R.id.button_query:
+                MTGCardDataSource.query("");
                 break;
         }
     }
