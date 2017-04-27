@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.DecksFragment">
+    tools:context=".frags.DecksFragment">
 
     <!-- Nothing really left in this view,
         Since this is just a list of all the user's created decks, this is done -->
