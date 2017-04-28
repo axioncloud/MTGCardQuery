@@ -102,12 +102,7 @@ public class MTGCardDataSource {
         values.put(MTGCardSQLiteHelper.CardColumns.life.toString(), card.getLife());
         values.put(MTGCardSQLiteHelper.CardColumns.names.toString(), card.getNames());
 
-        rowId = database.insert(MTGCardSQLiteHelper.STAGING_TABLE_NAME, null, values);
-    }
-
-    public void dumpStagingTable() {
-        database.rawQuery("INSERT INTO " + MTGCardSQLiteHelper.MAIN_TABLE_NAME + " SELECT * FROM " + MTGCardSQLiteHelper.STAGING_TABLE_NAME + ";", null);
-        database.rawQuery("DELETE FROM " + MTGCardSQLiteHelper.STAGING_TABLE_NAME + ";", null);
+        rowId = database.insert(MTGCardSQLiteHelper.MAIN_TABLE_NAME, null, values);
     }
 
     public void execRAWSQL(String sql) {

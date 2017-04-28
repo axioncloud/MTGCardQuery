@@ -24,6 +24,13 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     private Settings settings;
     private TextView lastupdate_textview;
 
+    /**
+     * Fragments:
+     * Don't touch a constructor
+     * Do initialization in onCreate()
+     * UI retrieval/updating in onCreateView
+     */
+
     public SettingsFragment() {
         // Required empty public constructor
     }
