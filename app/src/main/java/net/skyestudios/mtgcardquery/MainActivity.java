@@ -15,15 +15,20 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import net.skyestudios.mtgcardquery.data.Settings;
 import net.skyestudios.mtgcardquery.db.MTGCardDataSource;
 import net.skyestudios.mtgcardquery.fragments.DecksFragment;
 import net.skyestudios.mtgcardquery.fragments.QueryFragment;
 import net.skyestudios.mtgcardquery.fragments.SettingsFragment;
 import net.skyestudios.mtgcardquery.fragments.WishlistFragment;
 
+import java.io.File;
+import java.io.IOException;
+
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
+    private Settings settings;
     private Boolean backPressedOnce;
     private Toolbar toolbar;
     private DrawerLayout drawer;
@@ -39,6 +44,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_drawer);
+
+        File settingsFile = new File(getFilesDir(), "settings.bin");
+
+        try {
+            //If the file does not exist, create file and return true
+            if (settingsFile.createNewFile()) {
+                settings = new Settings(getApplicationContext());
+                settings.save(settingsFile);
+                settings.getAssetProcessor().execute();
+            } else {
+                settings = Settings.load(settingsFile);
+                settings.setApplicationContext(getApplicationContext());
+                settings.recreateAssetProcessor();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        handler = new Handler();
 
         backPressedOnce = false;
 
@@ -64,6 +88,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             currentDrawerID = savedInstanceState.getInt("currentDrawerId");
             displayFragment();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        settings.getMtgCardDataSource().closeDb();
     }
 
     @Override
@@ -97,6 +127,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.item_settings:
                 toolbar.setTitle(getString(R.string.app_name) + ": Settings");
                 fragment = new SettingsFragment();
+                Bundle args = new Bundle();
+                args.putSerializable("settings", settings);
+                fragment.setArguments(args);
                 fragmentManager.beginTransaction().addToBackStack(null).replace(R.id.fragment_container, fragment).commit();
                 break;
             case R.id.item_decks:
@@ -117,7 +150,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
         backPressedOnce = false;
-        handler = new Handler();
+        if (!settings.isDatabaseOpened()) {
+            settings.openDb(getApplicationContext());
+        }
     }
 
     @Override

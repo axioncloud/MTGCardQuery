@@ -39,35 +39,44 @@ public class AssetProcessorNotification {
         final Bitmap picture = BitmapFactory.decodeResource(res, R.mipmap.ic_launcher);
 
         final String title = "Card Asset Processor";
-        final String text = status;
 
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
 
-                // Set appropriate defaults for the notification light, sound,
-                // and vibration.
-                .setDefaults(Notification.DEFAULT_ALL)
+                // Set appropriate defaults for the notification lights
+                .setDefaults(Notification.DEFAULT_LIGHTS)
 
                 // Set required fields, including the small icon, the
                 // notification title, and text.
                 .setSmallIcon(R.drawable.ic_stat_card_asset_processor)
                 .setContentTitle(title)
                 .setContentText(String.format("Status: [%s]", status))
-
+                .setVibrate(new long[0])
                 // Use a default priority (recognized on devices running Android
                 // 4.1 or later)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
                 // Provide a large icon, shown with the notification in the
                 // notification drawer on devices running Android 3.0 or later.
-                .setLargeIcon(picture)
+                .setLargeIcon(picture);
 
-                // Automatically dismiss the notification when it is touched.
-                .setAutoCancel(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            builder.setColor(context.getColor(R.color.colorAccent));
+        } else {
+            builder.setColor(context.getResources().getColor(R.color.colorAccent));
+        }
 
+        if (status.contains("Successful") || status.contains("Cancelled") || status.contains("Up to date")) {
+            builder
+                    .setOngoing(false)
+                    .setAutoCancel(true);
+        } else {
+            builder
+                    .setOngoing(true)
+                    .setAutoCancel(false);
+        }
         notify(context, builder.build());
     }
 
-    @TargetApi(Build.VERSION_CODES.ECLAIR)
     private static void notify(final Context context, final Notification notification) {
         final NotificationManager nm = (NotificationManager) context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
