@@ -29,6 +29,7 @@ public final class Settings implements Serializable {
     public Settings(Context context) {
         applicationContext = context;
         databaseOpened = false;
+        databaseVersion = "";
         lastUpdateDate = new GregorianCalendar(TimeZone.getDefault());
         mtgCardDataSource = new MTGCardDataSource(applicationContext);
         assetProcessor = new AssetProcessor(applicationContext, mtgCardDataSource);

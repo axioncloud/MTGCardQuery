@@ -65,7 +65,7 @@ public class AssetProcessorNotification {
             builder.setColor(context.getResources().getColor(R.color.colorAccent));
         }
 
-        if (status.contains("Successful") || status.contains("Cancelled")) {
+        if (status.contains("Successful") || status.contains("Cancelled") || status.contains("Up to date")) {
             builder
                     .setOngoing(false)
                     .setAutoCancel(true);

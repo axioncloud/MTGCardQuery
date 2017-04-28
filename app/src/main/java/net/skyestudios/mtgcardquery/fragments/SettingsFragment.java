@@ -7,9 +7,13 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import net.skyestudios.mtgcardquery.R;
 import net.skyestudios.mtgcardquery.data.Settings;
+
+import java.util.GregorianCalendar;
+import java.util.Locale;
 
 
 /**
@@ -18,6 +22,7 @@ import net.skyestudios.mtgcardquery.data.Settings;
 public class SettingsFragment extends Fragment implements View.OnClickListener {
 
     private Settings settings;
+    private TextView lastupdate_textview;
 
     public SettingsFragment() {
         // Required empty public constructor
@@ -36,6 +41,13 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
         view.findViewById(R.id.button_forceupdate).setOnClickListener(this);
         view.findViewById(R.id.button_update).setOnClickListener(this);
+        lastupdate_textview = (TextView) view.findViewById(R.id.databaselastupdate_TextView);
+
+        String lastUpdate = String.format(Locale.US, "[%s/%s/%s]",
+                settings.getLastUpdateDate().get(GregorianCalendar.MONTH) + 1,
+                settings.getLastUpdateDate().get(GregorianCalendar.DAY_OF_MONTH),
+                settings.getLastUpdateDate().get(GregorianCalendar.YEAR));
+        lastupdate_textview.setText(lastUpdate);
         return view;
     }
 

@@ -143,7 +143,7 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                     BIS2.close();
                     if (!isCancelled()) {
                         AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
-                                "Successful"), 0);
+                                "Up to date"), 0);
                     } else {
                         AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
                                 "Cancelled"), 0);
