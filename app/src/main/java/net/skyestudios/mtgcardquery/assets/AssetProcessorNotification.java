@@ -53,7 +53,7 @@ public class AssetProcessorNotification {
                 .setVibrate(new long[0])
                 // Use a default priority (recognized on devices running Android
                 // 4.1 or later)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
 
                 // Provide a large icon, shown with the notification in the
                 // notification drawer on devices running Android 3.0 or later.
