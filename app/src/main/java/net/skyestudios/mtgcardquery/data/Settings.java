@@ -26,6 +26,7 @@ public final class Settings implements Serializable {
     private Boolean databaseOpened;
     private transient MTGCardDataSource mtgCardDataSource;
     private transient AssetProcessor assetProcessor;
+
     public Settings(Context context) {
         applicationContext = context;
         databaseOpened = false;

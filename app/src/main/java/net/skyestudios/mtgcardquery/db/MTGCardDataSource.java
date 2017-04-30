@@ -17,7 +17,7 @@ import java.util.List;
  */
 
 public class MTGCardDataSource {
-    private static SQLiteDatabase database;
+    private SQLiteDatabase database;
     private long rowId;
     private long rowIdIndex;
     private MTGCardSQLiteHelper databaseHelper;
@@ -28,7 +28,7 @@ public class MTGCardDataSource {
         rowId = 0;
     }
 
-    public static List<Card> query(String sql) {
+    public List<Card> query(String sql) {
         ArrayList<Card> cards = new ArrayList<>();
 
         String[] returnedColumns = {
@@ -37,7 +37,7 @@ public class MTGCardDataSource {
                 MTGCardSQLiteHelper.CardColumns.cmc.toString()
         };
 
-        Cursor cursor = database.rawQuery("SELECT * FROM " + MTGCardSQLiteHelper.MAIN_TABLE_NAME + ";", null);
+        Cursor cursor = database.rawQuery(sql, null);
 
         while (cursor.moveToNext()) {
             Card card = new Card();
