@@ -18,7 +18,6 @@ import android.widget.CheckBox;
 
 import net.skyestudios.mtgcardquery.R;
 import net.skyestudios.mtgcardquery.ResultsActivity;
-import net.skyestudios.mtgcardquery.db.MTGCardDataSource;
 
 /**
  * Created by arkeonet64 on 3/14/2017.
@@ -44,7 +43,6 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
     private boolean cb_greenState;
     private boolean cb_colorlessState;
     private Context context;
-    private MTGCardDataSource mtgCardDataSource;
     private String queryString;
 
     @Override
@@ -102,6 +100,7 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);
+        queryString = "";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             context = getContext();
         } else {
@@ -109,8 +108,6 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
         }
 
         resultsIntent = new Intent(context, ResultsActivity.class);
-
-        mtgCardDataSource = (MTGCardDataSource) getArguments().getSerializable("mtgCardDataSource");
 
         colorDialog = new AlertDialog.Builder(context, R.style.AppTheme_Dialog)
                 .setTitle("Color Selection")
