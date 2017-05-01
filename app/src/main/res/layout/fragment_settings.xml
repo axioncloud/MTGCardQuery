@@ -39,23 +39,41 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Last updated on:"
-                        android:textAlignment="center" />
+                        android:gravity="start"
+                        android:text="Last update:"
+                        android:textAlignment="textStart" />
 
                     <TextView
                         android:id="@+id/databaselastupdate_TextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Never" />
+                        android:text="Never"
+                        android:textAlignment="center" />
 
                     <Button
-                        android:id="@+id/force_updateButton"
+                        android:id="@+id/button_update"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Force Update" />
+                        android:text="Update" />
+
                 </LinearLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <Button
+                        android:id="@+id/button_forceupdate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_weight="1"
+                        android:text="Force Update" />
+                </RelativeLayout>
             </LinearLayout>
 
         </LinearLayout>

@@ -2,6 +2,7 @@ package net.skyestudios.mtgcardquery.fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,12 +17,16 @@ import android.widget.Button;
 import android.widget.CheckBox;
 
 import net.skyestudios.mtgcardquery.R;
+import net.skyestudios.mtgcardquery.ResultsActivity;
+import net.skyestudios.mtgcardquery.db.MTGCardDataSource;
 
 /**
  * Created by arkeonet64 on 3/14/2017.
  */
 
 public class QueryFragment extends Fragment implements View.OnClickListener {
+
+    private Intent resultsIntent;
 
     private Button openColorIdentityDialog;
     private Button openColorDialog;
@@ -39,10 +44,14 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
     private boolean cb_greenState;
     private boolean cb_colorlessState;
     private Context context;
+    private MTGCardDataSource mtgCardDataSource;
+    private String queryString;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_query, container, false);
+        View view = inflater.inflate(R.layout.fragment_query, container, false);
+        view.findViewById(R.id.button_query).setOnClickListener(this);
+        return view;
     }
 
     @Override
@@ -98,6 +107,10 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
         } else {
             context = getActivity().getApplicationContext();
         }
+
+        resultsIntent = new Intent(context, ResultsActivity.class);
+
+        mtgCardDataSource = (MTGCardDataSource) getArguments().getSerializable("mtgCardDataSource");
 
         colorDialog = new AlertDialog.Builder(context, R.style.AppTheme_Dialog)
                 .setTitle("Color Selection")
@@ -163,9 +176,9 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onResume() {
-        openColorDialog = (Button) getActivity().findViewById(R.id.openColorDialog);
+        openColorDialog = (Button) getActivity().findViewById(R.id.button_openColorDialog);
         openColorDialog.setOnClickListener(this);
-        openColorIdentityDialog = (Button) getActivity().findViewById(R.id.openColorIdentityDialog);
+        openColorIdentityDialog = (Button) getActivity().findViewById(R.id.button_openColorIdentityDialog);
         openColorIdentityDialog.setOnClickListener(this);
         super.onResume();
     }
@@ -173,10 +186,15 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.openColorDialog:
+            case R.id.button_openColorDialog:
                 colorDialog.show();
                 break;
-            case R.id.openColorIdentityDialog:
+            case R.id.button_openColorIdentityDialog:
+                break;
+            case R.id.button_query:
+                //TODO: Anyone - send Results Activity the SQL String & the MTGCardDataSource and it will query and show results
+                resultsIntent.putExtra("queryString", queryString);
+                startActivity(resultsIntent);
                 break;
         }
     }

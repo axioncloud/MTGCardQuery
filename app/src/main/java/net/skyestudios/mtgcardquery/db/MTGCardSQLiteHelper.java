@@ -13,7 +13,7 @@ public class MTGCardSQLiteHelper extends SQLiteOpenHelper {
 
     public static final String MAIN_TABLE_NAME = "MAINTABLE";
     public static final String STAGING_TABLE_NAME = "STAGINGTABLE";
-    private static final String DB_NAME = "cards.sqlite";
+    public static final String DB_NAME = "cards.sqlite";
 
     public MTGCardSQLiteHelper(Context context) {
         super(context, DB_NAME, null, 1);
@@ -50,7 +50,7 @@ public class MTGCardSQLiteHelper extends SQLiteOpenHelper {
 
     @NonNull
     public static String createStagingTableString() {
-        return "CREATE TABLE " + MAIN_TABLE_NAME + " (" +
+        return "CREATE TABLE " + STAGING_TABLE_NAME + " (" +
                 CardColumns.id + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 CardColumns.name + " TEXT , " +
                 CardColumns.layout + " TEXT , " +
@@ -80,6 +80,8 @@ public class MTGCardSQLiteHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         String sql = createMainTableString();
+        sqLiteDatabase.execSQL(sql);
+        sql = createStagingTableString();
         sqLiteDatabase.execSQL(sql);
     }
 
