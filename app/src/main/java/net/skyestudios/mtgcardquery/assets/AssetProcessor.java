@@ -107,6 +107,13 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
 
         if (!isCancelled()) {
             fragmentJSON();
+            if (!isCancelled()) {
+                AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
+                        "Inserting Cards"), 0);
+            } else {
+                AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
+                        "Cancelled"), 0);
+            }
             for (int i = 0; i < fileFragments; i++) {
                 processFragment(i);
             }
@@ -232,7 +239,7 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
         running = false;
         if (!isCancelled()) {
             AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
-                    "Successful"), 0);
+                    "Up to date"), 0);
         } else {
             AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
                     "Cancelled"), 0);
@@ -363,13 +370,6 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
         mtgCardDataSource.beginTransaction();
         Card card;
         try {
-            if (!isCancelled()) {
-                AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
-                        "Inserting Cards"), 0);
-            } else {
-                AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
-                        "Cancelled"), 0);
-            }
             String TAG = "INFO";
             File fragment = new File(context.getFilesDir(), fragmentPrefix + fragmentIndex + ".json");
             FileInputStream FIS = new FileInputStream(fragment);
@@ -573,10 +573,6 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
         mtgCardDataSource.setTransactionSuccessful();
         mtgCardDataSource.endTransaction();
 
-        mtgCardDataSource.beginTransaction();
-        mtgCardDataSource.dumpStagingTable();
-        mtgCardDataSource.setTransactionSuccessful();
-        mtgCardDataSource.endTransaction();
     }
 
     public boolean isRunning() {

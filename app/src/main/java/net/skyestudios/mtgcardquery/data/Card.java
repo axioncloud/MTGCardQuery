@@ -55,6 +55,35 @@ public class Card {
         names = "";
     }
 
+    @Override
+    public String toString() {
+        return "Card{" +
+                "name='" + name + '\'' +
+                ", layout='" + layout + '\'' +
+                ", colors='" + colors + '\'' +
+                ", cmc=" + cmc +
+                ", manaCost='" + manaCost + '\'' +
+                ", type='" + type + '\'' +
+                ", types='" + types + '\'' +
+                ", subtypes='" + subtypes + '\'' +
+                ", text='" + text + '\'' +
+                ", power='" + power + '\'' +
+                ", toughness='" + toughness + '\'' +
+                ", imageName='" + imageName + '\'' +
+                ", printings='" + printings + '\'' +
+                ", source='" + source + '\'' +
+                ", rulings='" + rulings + '\'' +
+                ", colorIdentity='" + colorIdentity + '\'' +
+                ", legalities='" + legalities + '\'' +
+                ", supertypes='" + supertypes + '\'' +
+                ", starter=" + starter +
+                ", loyalty=" + loyalty +
+                ", hand=" + hand +
+                ", life=" + life +
+                ", names='" + names + '\'' +
+                '}';
+    }
+
     public String getName() {
         return name;
     }
