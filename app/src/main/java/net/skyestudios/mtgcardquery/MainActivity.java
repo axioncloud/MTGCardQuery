@@ -18,7 +18,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import net.skyestudios.mtgcardquery.data.Settings;
+import net.skyestudios.mtgcardquery.db.CloseDatabaseTask;
 import net.skyestudios.mtgcardquery.db.MTGCardDataSource;
+import net.skyestudios.mtgcardquery.db.OpenDatabaseTask;
 import net.skyestudios.mtgcardquery.fragments.DecksFragment;
 import net.skyestudios.mtgcardquery.fragments.QueryFragment;
 import net.skyestudios.mtgcardquery.fragments.SettingsFragment;
@@ -54,11 +56,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (settingsFile.createNewFile()) {
                 settings = new Settings(getApplicationContext());
                 settings.save(settingsFile);
+                new OpenDatabaseTask(settings.getMtgCardDataSource()).execute();
                 settings.getAssetProcessor().execute();
+                new CloseDatabaseTask(settings.getMtgCardDataSource()).execute();
             } else {
                 settings = Settings.load(settingsFile);
                 settings.setApplicationContext(getApplicationContext());
-                settings.recreateAssetProcessor();
+                settings.recreateAssetProcessor(); //This is needed because asset processor is not serializable so it is null when Settings is saved
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -100,7 +104,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onStop() {
         super.onStop();
-        settings.getMtgCardDataSource().closeDb();
     }
 
     @Override
