@@ -48,9 +48,11 @@ public class CardViewAdapter extends ArrayAdapter<CardView> {
         TextView name = (TextView) rowView.findViewById(R.id.card_name);
         TextView manacost = (TextView) rowView.findViewById(R.id.card_mana_cost);
         TextView text = (TextView) rowView.findViewById(R.id.card_text);
+        TextView type = (TextView) rowView.findViewById(R.id.card_type);
         name.setText(cardViews.get(position).getName());
         manacost.setText(cardViews.get(position).getManaCost());
         text.setText(cardViews.get(position).getText());
+        type.setText(cardViews.get(position).getType());
         return rowView;
     }
 }

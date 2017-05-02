@@ -1,10 +1,12 @@
 package net.skyestudios.mtgcardquery.data;
 
+import java.io.Serializable;
+
 /**
  * Created by arkeonet64 on 4/4/2017.
  */
 
-public class Card {
+public class Card implements Serializable {
     private String name;
     private String layout;
     private String colors;
