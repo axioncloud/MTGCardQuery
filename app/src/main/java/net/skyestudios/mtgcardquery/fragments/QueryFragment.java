@@ -373,45 +373,45 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
             text = "text IS NOT NULL";
         }
         if(cb_white != null && cb_white.isChecked()){
-            color_white = "'White'";
+            color_white = "colors LIKE '%White%'";
         }
         if(cb_green != null && cb_green.isChecked()){
-           color_green = "'Green'";
+           color_green = "colors LIKE '%Green%'";
         }
         if(cb_red != null && cb_red.isChecked()){
-            color_red = "'Red'";
+            color_red = "colors LIKE '%Red%'";
         }
         if(cb_black != null && cb_black.isChecked()){
-            color_black = "'Black'";
+            color_black = "colors LIKE '%Black%'";
         }
         if(cb_blue != null && cb_blue.isChecked()){
-            color_blue = "'Blue'";
+            color_blue = "colors LIKE '%Blue%'";
         }
         if(cb_colorless != null && cb_colorless.isChecked()){
-            color_colorless = "''";
+            color_colorless = "colors LIKE ''";
         }
         if(cb_white1 != null && cb_white1.isChecked()){
-            colorId_white = "'White'";
+            colorId_white = "colorIdentity LIKE '%White%'";
         }
         if(cb_green1 != null && cb_green1.isChecked()){
-            colorId_green = "'Green'";
+            colorId_green = "colorIdentity LIKE '%Green%'";
         }
         if(cb_red1 != null && cb_red1.isChecked()){
-            colorId_red = "'Red'";
+            colorId_red = "colorIdentity LIKE '%Red%'";
         }
         if(cb_black1 != null && cb_black1.isChecked()){
-            colorId_black = "'Black'";
+            colorId_black = "colorIdentity LIKE '%Black%";
         }
         if(cb_blue1 != null && cb_blue1.isChecked()){
-            colorId_blue = "'Blue'";
+            colorId_blue = "colorIdentity LIKE '%Blue%'";
         }
         if(cb_colorless1 != null && cb_colorless1.isChecked()){
-            colorId_colorless = "''";
+            colorId_colorless = "colorIdentity LIKE ''";
         }
 
         queryString = "SELECT * FROM " + MAIN_TABLE_NAME
-                         + " WHERE " + name;/*
-                         + " AND " + superType
+                         + " WHERE " + name
+                         + " AND " + superType;/*
                          + " AND " + subType
                          + " AND " + text
                          + " AND " + "colors in (" + color_white +  "," + color_green + "," + color_red + "," + color_black + "," + color_blue + "," + color_colorless + ")"
