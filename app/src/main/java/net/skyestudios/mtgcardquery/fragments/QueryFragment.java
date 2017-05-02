@@ -339,35 +339,35 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
         String toughNum = tough_number_spinner.getSelectedItem().toString();
         String cmcSym = cmc_spinner.getSelectedItem().toString();
         String cmcNum = cmc_number_spinner.getSelectedItem().toString();
-        String color_white = "null";
-        String color_green = "null";
-        String color_red = "null";
-        String color_black = "null";
-        String color_blue = "null";
+        String color_white = "''";
+        String color_green = "''";
+        String color_red = "''";
+        String color_black = "''";
+        String color_blue = "''";
         String color_colorless = "''";
-        String colorId_white = "null";
-        String colorId_green = "null";
-        String colorId_red = "null";
-        String colorId_black = "null";
-        String colorId_blue = "null";
+        String colorId_white = "''";
+        String colorId_green = "''";
+        String colorId_red = "''";
+        String colorId_black = "''";
+        String colorId_blue = "''";
         String colorId_colorless = "''";
 
-        if(name != null){
+        if(!name.isEmpty()){
             name = "name = '%" + name + "%'";
         }else{
             name ="name IS NOT NULL";
         }
-        if(superType != null){
+        if(!superType.isEmpty()){
             superType = "supertypes = '" + superType + "'";
         }else{
             superType = "supertypes IS NOT NULL";
         }
-        if(subType != null){
+        if(!subType.isEmpty()){
             subType = "subtypes = '" + subType + "'";
         }else{
             subType = "subtypes IS NOT NULL";
         }
-        if(text != null){
+        if(!text.isEmpty()){
             text = "text = '%" + text + "%'";
         }else{
             text = "text IS NOT NULL";
@@ -403,7 +403,8 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
             colorId_blue = "'Blue'";
         }
 
-        queryString = "SELECT * FROM " + MAIN_TABLE_NAME
+        queryString = "SELECT * FROM " + MAIN_TABLE_NAME;
+        /*
                          + " WHERE " + name
                          + " AND " + superType
                          + " AND " + subType
@@ -413,7 +414,7 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
                          + " AND " + "power " + powerSym + " " + powerNum
                          + " AND " + "toughness " + toughSym + " " + toughNum
                          + " AND " + "cmc " + cmcSym + " " + cmcNum
-                         + " ORDER BY name ASC;";
+                         + " ORDER BY name ASC;";*/
     }
 
 }
