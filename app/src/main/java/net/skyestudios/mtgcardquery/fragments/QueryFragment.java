@@ -372,39 +372,44 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
         }else{
             text = "text IS NOT NULL";
         }
-        if(cb_white.isChecked()){
+        if(cb_white != null && cb_white.isChecked()){
             color_white = "'White'";
         }
-        if(cb_green.isChecked()){
+        if(cb_green != null && cb_green.isChecked()){
            color_green = "'Green'";
         }
-        if(cb_red.isChecked()){
+        if(cb_red != null && cb_red.isChecked()){
             color_red = "'Red'";
         }
-        if(cb_black.isChecked()){
+        if(cb_black != null && cb_black.isChecked()){
             color_black = "'Black'";
         }
-        if(cb_blue.isChecked()){
+        if(cb_blue != null && cb_blue.isChecked()){
             color_blue = "'Blue'";
         }
-        if(cb_white1.isChecked()){
+        if(cb_colorless != null && cb_colorless.isChecked()){
+            color_colorless = "''";
+        }
+        if(cb_white1 != null && cb_white1.isChecked()){
             colorId_white = "'White'";
         }
-        if(cb_green1.isChecked()){
+        if(cb_green1 != null && cb_green1.isChecked()){
             colorId_green = "'Green'";
         }
-        if(cb_red1.isChecked()){
+        if(cb_red1 != null && cb_red1.isChecked()){
             colorId_red = "'Red'";
         }
-        if(cb_black1.isChecked()){
+        if(cb_black1 != null && cb_black1.isChecked()){
             colorId_black = "'Black'";
         }
-        if(cb_blue1.isChecked()){
+        if(cb_blue1 != null && cb_blue1.isChecked()){
             colorId_blue = "'Blue'";
         }
+        if(cb_colorless1 != null && cb_colorless1.isChecked()){
+            colorId_colorless = "''";
+        }
 
-        queryString = "SELECT * FROM " + MAIN_TABLE_NAME;
-        /*
+        queryString = "SELECT * FROM " + MAIN_TABLE_NAME
                          + " WHERE " + name
                          + " AND " + superType
                          + " AND " + subType
@@ -414,7 +419,7 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
                          + " AND " + "power " + powerSym + " " + powerNum
                          + " AND " + "toughness " + toughSym + " " + toughNum
                          + " AND " + "cmc " + cmcSym + " " + cmcNum
-                         + " ORDER BY name ASC;";*/
+                         + " ORDER BY name ASC;";
     }
 
 }
