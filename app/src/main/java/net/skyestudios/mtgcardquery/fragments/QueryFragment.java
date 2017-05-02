@@ -21,6 +21,8 @@ import android.widget.Spinner;
 import net.skyestudios.mtgcardquery.R;
 import net.skyestudios.mtgcardquery.ResultsActivity;
 
+import static net.skyestudios.mtgcardquery.db.MTGCardSQLiteHelper.MAIN_TABLE_NAME;
+
 /**
  * Created by arkeonet64 on 3/14/2017.
  */
@@ -327,7 +329,91 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
     }
 
     private void buildQueryString() {
+        String name = card_name_Query.getText().toString();
+        String superType = super_type_text.getText().toString();
+        String subType = subtype_text.getText().toString();
+        String text = text_text.getText().toString();
+        String powerSym = power_spinner.getSelectedItem().toString();
+        String powerNum = power_number_spinner.getSelectedItem().toString();
+        String toughSym = tough_spinner.getSelectedItem().toString();
+        String toughNum = tough_number_spinner.getSelectedItem().toString();
+        String cmcSym = cmc_spinner.getSelectedItem().toString();
+        String cmcNum = cmc_number_spinner.getSelectedItem().toString();
+        String color_white = "null";
+        String color_green = "null";
+        String color_red = "null";
+        String color_black = "null";
+        String color_blue = "null";
+        String color_colorless = "''";
+        String colorId_white = "null";
+        String colorId_green = "null";
+        String colorId_red = "null";
+        String colorId_black = "null";
+        String colorId_blue = "null";
+        String colorId_colorless = "''";
 
+        if(name != null){
+            name = "name = '%" + name + "%'";
+        }else{
+            name ="name IS NOT NULL";
+        }
+        if(superType != null){
+            superType = "supertypes = '" + superType + "'";
+        }else{
+            superType = "supertypes IS NOT NULL";
+        }
+        if(subType != null){
+            subType = "subtypes = '" + subType + "'";
+        }else{
+            subType = "subtypes IS NOT NULL";
+        }
+        if(text != null){
+            text = "text = '%" + text + "%'";
+        }else{
+            text = "text IS NOT NULL";
+        }
+        if(cb_white.isChecked()){
+            color_white = "'White'";
+        }
+        if(cb_green.isChecked()){
+           color_green = "'Green'";
+        }
+        if(cb_red.isChecked()){
+            color_red = "'Red'";
+        }
+        if(cb_black.isChecked()){
+            color_black = "'Black'";
+        }
+        if(cb_blue.isChecked()){
+            color_blue = "'Blue'";
+        }
+        if(cb_white1.isChecked()){
+            colorId_white = "'White'";
+        }
+        if(cb_green1.isChecked()){
+            colorId_green = "'Green'";
+        }
+        if(cb_red1.isChecked()){
+            colorId_red = "'Red'";
+        }
+        if(cb_black1.isChecked()){
+            colorId_black = "'Black'";
+        }
+        if(cb_blue1.isChecked()){
+            colorId_blue = "'Blue'";
+        }
+
+        queryString = "SELECT * FROM " + MAIN_TABLE_NAME
+                         + " WHERE " + name
+                         + " AND " + superType
+                         + " AND " + subType
+                         + " AND " + text
+                         + " AND " + "colors in (" + color_white +  "," + color_green + "," + color_red + "," + color_black + "," + color_blue + "," + color_colorless + ")"
+                         + " AND " + "colorIdentity in (" + colorId_white +  "," + colorId_green + "," + colorId_red + "," + colorId_black + "," + colorId_blue + "," + colorId_colorless + ")"
+                         + " AND " + "power " + powerSym + " " + powerNum
+                         + " AND " + "toughness " + toughSym + " " + toughNum
+                         + " AND " + "cmc " + cmcSym + " " + cmcNum
+                         + " ORDER BY name ASC;";
     }
 
 }
