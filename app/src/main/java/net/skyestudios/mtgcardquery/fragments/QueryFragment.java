@@ -15,9 +15,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.Spinner;
 
 import net.skyestudios.mtgcardquery.R;
 import net.skyestudios.mtgcardquery.ResultsActivity;
+
+import static net.skyestudios.mtgcardquery.db.MTGCardSQLiteHelper.MAIN_TABLE_NAME;
 
 /**
  * Created by arkeonet64 on 3/14/2017.
@@ -42,6 +46,32 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
     private boolean cb_blackState;
     private boolean cb_greenState;
     private boolean cb_colorlessState;
+    /***********************************************/
+    private AlertDialog colorIdentityDialog;
+    private CheckBox cb_white1;
+    private CheckBox cb_green1;
+    private CheckBox cb_red1;
+    private CheckBox cb_black1;
+    private CheckBox cb_blue1;
+    private CheckBox cb_colorless1;
+    private boolean cb_whiteState1;
+    private boolean cb_redState1;
+    private boolean cb_blueState1;
+    private boolean cb_blackState1;
+    private boolean cb_greenState1;
+    private boolean cb_colorlessState1;
+    /***********************************************/
+    private EditText card_name_Query;
+    private EditText super_type_text;
+    private EditText subtype_text;
+    private EditText text_text;
+    private Spinner power_spinner;
+    private Spinner power_number_spinner;
+    private Spinner tough_spinner;
+    private Spinner tough_number_spinner;
+    private Spinner cmc_spinner;
+    private Spinner cmc_number_spinner;
+    /***********************************************/
     private Context context;
     private String queryString;
 
@@ -95,6 +125,37 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
         if (cb_colorless != null) {
             cb_colorless.setChecked(false);
         }
+
+        /***********************************************/
+
+        cb_whiteState1 = false;
+        cb_redState1 = false;
+        cb_colorlessState1 = false;
+        cb_blackState1 = false;
+        cb_blueState1 = false;
+        cb_greenState1 = false;
+
+        if (cb_white1 != null) {
+            cb_white1.setChecked(false);
+        }
+        if (cb_green1 != null) {
+            cb_green1.setChecked(false);
+        }
+        if (cb_red1 != null) {
+            cb_red1.setChecked(false);
+        }
+        if (cb_black1 != null) {
+            cb_black1.setChecked(false);
+        }
+        if (cb_blue1 != null) {
+            cb_blue1.setChecked(false);
+        }
+        if (cb_colorless1 != null) {
+            cb_colorless1.setChecked(false);
+        }
+
+        /***********************************************/
+
     }
 
     @Override
@@ -109,7 +170,7 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
 
         resultsIntent = new Intent(context, ResultsActivity.class);
 
-        colorDialog = new AlertDialog.Builder(context, R.style.AppTheme_Dialog)
+        colorDialog = new AlertDialog.Builder(getContext(), R.style.AppTheme_Dialog)
                 .setTitle("Color Selection")
                 .setView(R.layout.layout_dialog_color)
                 .setCancelable(false)
@@ -162,6 +223,63 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
                 }
             }
         });
+
+        /***********************************************/
+        colorIdentityDialog = new AlertDialog.Builder(getContext(), R.style.AppTheme_Dialog)
+                .setTitle("Color Selection")
+                .setView(R.layout.layout_dialog_color)
+                .setCancelable(false)
+                .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        cb_whiteState1 = cb_white1.isChecked();
+                        cb_redState1 = cb_red1.isChecked();
+                        cb_blueState1 = cb_blue1.isChecked();
+                        cb_blackState1 = cb_black1.isChecked();
+                        cb_greenState1 = cb_green1.isChecked();
+                        cb_colorlessState1 = cb_colorless1.isChecked();
+                        dialogInterface.dismiss();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        cb_white1.setChecked(cb_whiteState1);
+                        cb_black1.setChecked(cb_blackState1);
+                        cb_blue1.setChecked(cb_blueState1);
+                        cb_green1.setChecked(cb_greenState1);
+                        cb_colorless1.setChecked(cb_colorlessState1);
+                        cb_red1.setChecked(cb_redState1);
+
+                        dialogInterface.dismiss();
+                    }
+                })
+                .create();
+        colorIdentityDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                if (cb_white1 == null) {
+                    cb_white1 = (CheckBox) colorIdentityDialog.findViewById(R.id.color_query_white);
+                }
+                if (cb_green1 == null) {
+                    cb_green1 = (CheckBox) colorIdentityDialog.findViewById(R.id.color_query_green);
+                }
+                if (cb_red1 == null) {
+                    cb_red1 = (CheckBox) colorIdentityDialog.findViewById(R.id.color_query_red);
+                }
+                if (cb_black1 == null) {
+                    cb_black1 = (CheckBox) colorIdentityDialog.findViewById(R.id.color_query_black);
+                }
+                if (cb_blue1 == null) {
+                    cb_blue1 = (CheckBox) colorIdentityDialog.findViewById(R.id.color_query_blue);
+                }
+                if (cb_colorless1 == null) {
+                    cb_colorless1 = (CheckBox) colorIdentityDialog.findViewById(R.id.color_query_colorless);
+                }
+            }
+        });
+
+        /***********************************************/
         super.onCreate(savedInstanceState);
     }
 
@@ -169,6 +287,7 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
     public void onStop() {
         super.onStop();
         colorDialog.dismiss();
+        colorIdentityDialog.dismiss();
     }
 
     @Override
@@ -177,6 +296,18 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
         openColorDialog.setOnClickListener(this);
         openColorIdentityDialog = (Button) getActivity().findViewById(R.id.button_openColorIdentityDialog);
         openColorIdentityDialog.setOnClickListener(this);
+        /************************************************/
+        card_name_Query = (EditText) getActivity().findViewById(R.id.card_name_Query);
+        super_type_text = (EditText) getActivity().findViewById(R.id.super_type_text);
+        subtype_text = (EditText) getActivity().findViewById(R.id.subtype_text);
+        text_text = (EditText) getActivity().findViewById(R.id.text_text);
+        power_spinner = (Spinner) getActivity().findViewById(R.id.power_spinner);
+        power_number_spinner = (Spinner) getActivity().findViewById(R.id.power_number_spinner);
+        tough_spinner = (Spinner) getActivity().findViewById(R.id.tough_spinner);
+        tough_number_spinner = (Spinner) getActivity().findViewById(R.id.tough_number_spinner);
+        cmc_spinner = (Spinner) getActivity().findViewById(R.id.cmc_spinner);
+        cmc_number_spinner = (Spinner) getActivity().findViewById(R.id.cmc_number_spinner);
+        /************************************************/
         super.onResume();
     }
 
@@ -187,12 +318,102 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
                 colorDialog.show();
                 break;
             case R.id.button_openColorIdentityDialog:
+               colorIdentityDialog.show();
                 break;
             case R.id.button_query:
-                //TODO: Anyone - send Results Activity the SQL String & the MTGCardDataSource and it will query and show results
+                buildQueryString();
                 resultsIntent.putExtra("queryString", queryString);
                 startActivity(resultsIntent);
                 break;
         }
     }
+
+    private void buildQueryString() {
+        String name = card_name_Query.getText().toString();
+        String superType = super_type_text.getText().toString();
+        String subType = subtype_text.getText().toString();
+        String text = text_text.getText().toString();
+        String powerSym = power_spinner.getSelectedItem().toString();
+        String powerNum = power_number_spinner.getSelectedItem().toString();
+        String toughSym = tough_spinner.getSelectedItem().toString();
+        String toughNum = tough_number_spinner.getSelectedItem().toString();
+        String cmcSym = cmc_spinner.getSelectedItem().toString();
+        String cmcNum = cmc_number_spinner.getSelectedItem().toString();
+        String color_white = "null";
+        String color_green = "null";
+        String color_red = "null";
+        String color_black = "null";
+        String color_blue = "null";
+        String color_colorless = "''";
+        String colorId_white = "null";
+        String colorId_green = "null";
+        String colorId_red = "null";
+        String colorId_black = "null";
+        String colorId_blue = "null";
+        String colorId_colorless = "''";
+
+        if(name != null){
+            name = "name = '%" + name + "%'";
+        }else{
+            name ="name IS NOT NULL";
+        }
+        if(superType != null){
+            superType = "supertypes = '" + superType + "'";
+        }else{
+            superType = "supertypes IS NOT NULL";
+        }
+        if(subType != null){
+            subType = "subtypes = '" + subType + "'";
+        }else{
+            subType = "subtypes IS NOT NULL";
+        }
+        if(text != null){
+            text = "text = '%" + text + "%'";
+        }else{
+            text = "text IS NOT NULL";
+        }
+        if(cb_white.isChecked()){
+            color_white = "'White'";
+        }
+        if(cb_green.isChecked()){
+           color_green = "'Green'";
+        }
+        if(cb_red.isChecked()){
+            color_red = "'Red'";
+        }
+        if(cb_black.isChecked()){
+            color_black = "'Black'";
+        }
+        if(cb_blue.isChecked()){
+            color_blue = "'Blue'";
+        }
+        if(cb_white1.isChecked()){
+            colorId_white = "'White'";
+        }
+        if(cb_green1.isChecked()){
+            colorId_green = "'Green'";
+        }
+        if(cb_red1.isChecked()){
+            colorId_red = "'Red'";
+        }
+        if(cb_black1.isChecked()){
+            colorId_black = "'Black'";
+        }
+        if(cb_blue1.isChecked()){
+            colorId_blue = "'Blue'";
+        }
+
+        queryString = "SELECT * FROM " + MAIN_TABLE_NAME
+                         + " WHERE " + name
+                         + " AND " + superType
+                         + " AND " + subType
+                         + " AND " + text
+                         + " AND " + "colors in (" + color_white +  "," + color_green + "," + color_red + "," + color_black + "," + color_blue + "," + color_colorless + ")"
+                         + " AND " + "colorIdentity in (" + colorId_white +  "," + colorId_green + "," + colorId_red + "," + colorId_black + "," + colorId_blue + "," + colorId_colorless + ")"
+                         + " AND " + "power " + powerSym + " " + powerNum
+                         + " AND " + "toughness " + toughSym + " " + toughNum
+                         + " AND " + "cmc " + cmcSym + " " + cmcNum
+                         + " ORDER BY name ASC;";
+    }
+
 }
