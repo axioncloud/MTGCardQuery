@@ -4,12 +4,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import net.skyestudios.mtgcardquery.data.Card;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -31,12 +29,6 @@ public class MTGCardDataSource {
     public List<Card> query(String sql) {
         ArrayList<Card> cards = new ArrayList<>();
 
-        String[] returnedColumns = {
-                MTGCardSQLiteHelper.CardColumns.name.toString(),
-                MTGCardSQLiteHelper.CardColumns.text.toString(),
-                MTGCardSQLiteHelper.CardColumns.cmc.toString()
-        };
-
         Cursor cursor = database.rawQuery(sql, null);
 
         while (cursor.moveToNext()) {
@@ -44,10 +36,13 @@ public class MTGCardDataSource {
             card.setName(cursor.getString(cursor.getColumnIndex(MTGCardSQLiteHelper.CardColumns.name.toString())));
             card.setText(cursor.getString(cursor.getColumnIndex(MTGCardSQLiteHelper.CardColumns.text.toString())));
             card.setCmc(cursor.getDouble(cursor.getColumnIndex(MTGCardSQLiteHelper.CardColumns.cmc.toString())));
+            card.setManaCost(cursor.getString(cursor.getColumnIndex(MTGCardSQLiteHelper.CardColumns.manaCost.toString())));
+            card.setLoyalty(cursor.getInt(cursor.getColumnIndex(MTGCardSQLiteHelper.CardColumns.loyalty.toString())));
+            card.setColors(cursor.getString(cursor.getColumnIndex(MTGCardSQLiteHelper.CardColumns.colors.toString())));
+            card.setColorIdentity(cursor.getString(cursor.getColumnIndex(MTGCardSQLiteHelper.CardColumns.colorIdentity.toString())));
             cards.add(card);
         }
 
-        Log.d("DEBUG", "cards: " + Arrays.toString(cards.toArray()));
         return cards;
     }
 
