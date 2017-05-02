@@ -353,22 +353,22 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
         String colorId_colorless = "''";
 
         if(!name.isEmpty()){
-            name = "name = '%" + name + "%'";
+            name = "name LIKE '%" + name + "%'";
         }else{
             name ="name IS NOT NULL";
         }
         if(!superType.isEmpty()){
-            superType = "supertypes = '" + superType + "'";
+            superType = "supertypes LIKE '%" + superType + "%'";
         }else{
             superType = "supertypes IS NOT NULL";
         }
         if(!subType.isEmpty()){
-            subType = "subtypes = '" + subType + "'";
+            subType = "subtypes LIKE '%" + subType + "%'";
         }else{
             subType = "subtypes IS NOT NULL";
         }
         if(!text.isEmpty()){
-            text = "text = '%" + text + "%'";
+            text = "text LIKE '%" + text + "%'";
         }else{
             text = "text IS NOT NULL";
         }
@@ -410,7 +410,7 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
         }
 
         queryString = "SELECT * FROM " + MAIN_TABLE_NAME
-                         + " WHERE " + name
+                         + " WHERE " + name;/*
                          + " AND " + superType
                          + " AND " + subType
                          + " AND " + text
@@ -419,7 +419,7 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
                          + " AND " + "power " + powerSym + " " + powerNum
                          + " AND " + "toughness " + toughSym + " " + toughNum
                          + " AND " + "cmc " + cmcSym + " " + cmcNum
-                         + " ORDER BY name ASC;";
+                         + " ORDER BY name ASC;";*/
     }
 
 }
