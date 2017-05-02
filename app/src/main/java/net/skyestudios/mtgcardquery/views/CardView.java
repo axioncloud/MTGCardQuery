@@ -35,4 +35,8 @@ public class CardView {
     public String getText() {
         return card.getText();
     }
+
+    public String getType() {
+        return card.getType();
+    }
 }

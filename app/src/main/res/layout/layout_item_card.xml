@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="100dp">
+    android:layout_height="140dp">
 
     <TextView
         android:id="@+id/card_name"
@@ -12,20 +12,9 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_toStartOf="@+id/card_mana_cost"
+        android:paddingLeft="4dp"
         android:textSize="30sp"
         tools:text="Card Name" />
-
-    <TextView
-        android:id="@+id/card_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/card_name"
-        android:ellipsize="end"
-        android:lines="3"
-        android:singleLine="false"
-        tools:text="Text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text" />
 
     <TextView
         android:id="@+id/card_mana_cost"
@@ -34,6 +23,30 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
+        android:paddingRight="4dp"
         android:textSize="30sp"
         tools:text="{6}{G}{G}" />
+
+    <TextView
+        android:id="@+id/card_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/card_name"
+        android:paddingLeft="8dp"
+        android:textSize="24sp"
+        tools:text="Creature - Wall" />
+
+    <TextView
+        android:id="@+id/card_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/card_type"
+        android:ellipsize="end"
+        android:lines="3"
+        android:paddingLeft="8dp"
+        android:singleLine="false"
+        tools:text="Text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text" />
+
 </RelativeLayout>

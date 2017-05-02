@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import net.skyestudios.mtgcardquery.R;
 import net.skyestudios.mtgcardquery.data.Settings;
+import net.skyestudios.mtgcardquery.db.CloseDatabaseTask;
+import net.skyestudios.mtgcardquery.db.OpenDatabaseTask;
 
 import java.util.GregorianCalendar;
 import java.util.Locale;
@@ -64,11 +66,15 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             case R.id.button_forceupdate:
                 settings.recreateAssetProcessor();
                 settings.getAssetProcessor().setForcedUpdate();
+                new OpenDatabaseTask(settings.getMtgCardDataSource()).execute();
                 settings.getAssetProcessor().execute();
+                new CloseDatabaseTask(settings.getMtgCardDataSource()).execute();
                 break;
             case R.id.button_update:
                 settings.recreateAssetProcessor();
+                new OpenDatabaseTask(settings.getMtgCardDataSource()).execute();
                 settings.getAssetProcessor().execute();
+                new CloseDatabaseTask(settings.getMtgCardDataSource()).execute();
         }
     }
 }
