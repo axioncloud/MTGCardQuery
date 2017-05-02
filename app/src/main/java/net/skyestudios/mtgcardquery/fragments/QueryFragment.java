@@ -437,7 +437,8 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
                      + " AND " + "toughness " + toughSym + " " + toughNum
                      + " AND " + "cmc " + cmcSym + " " + cmcNum
                      + " ORDER BY name ASC;";
-                     */
+
+                */
     }
 
 }
