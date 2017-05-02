@@ -4,18 +4,25 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.ListView;
+import android.widget.Toast;
 
+import net.skyestudios.mtgcardquery.adapters.CardViewAdapter;
 import net.skyestudios.mtgcardquery.data.Card;
 import net.skyestudios.mtgcardquery.db.MTGCardDataSource;
 import net.skyestudios.mtgcardquery.db.OpenDatabaseTask;
+import net.skyestudios.mtgcardquery.views.CardView;
 
 import java.util.List;
+import java.util.Locale;
 
 public class ResultsActivity extends AppCompatActivity {
+    CardViewAdapter cardViewAdapter;
     MTGCardDataSource mtgCardDataSource;
     private String queryString;
     private ProgressDialog waitingDialog;
     private List<Card> cards;
+    private ListView resultsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,29 +38,23 @@ public class ResultsActivity extends AppCompatActivity {
         mtgCardDataSource = new MTGCardDataSource(this);
         new OpenDatabaseTask(mtgCardDataSource).execute();
         new QueryDatabase().execute();
-        //Open DB
-        //query
-        //get results
-        //display results and close DB
+        resultsList = (ListView) findViewById(R.id.results_list);
+        resultsList.setAdapter((cardViewAdapter = new CardViewAdapter(this, R.layout.layout_card_view)));
     }
 
 
     private class QueryDatabase extends AsyncTask<String, Void, Void> {
         @Override
         protected Void doInBackground(String... strings) {
-//            cards = mtgCardDataSource.query(queryString);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            //create list of CardViews and insert them into ResultsActivity's List
+            cards = mtgCardDataSource.query(queryString);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             waitingDialog.dismiss();
+            Toast.makeText(ResultsActivity.this, String.format(Locale.US, "%d records found", cards.size()), Toast.LENGTH_SHORT).show();
+            cardViewAdapter.addAll(CardView.createListFromCards(cards));
             super.onPostExecute(aVoid);
         }
     }
