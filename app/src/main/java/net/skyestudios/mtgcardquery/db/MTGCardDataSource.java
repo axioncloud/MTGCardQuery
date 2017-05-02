@@ -40,6 +40,7 @@ public class MTGCardDataSource {
             card.setLoyalty(cursor.getInt(cursor.getColumnIndex(MTGCardSQLiteHelper.CardColumns.loyalty.toString())));
             card.setColors(cursor.getString(cursor.getColumnIndex(MTGCardSQLiteHelper.CardColumns.colors.toString())));
             card.setColorIdentity(cursor.getString(cursor.getColumnIndex(MTGCardSQLiteHelper.CardColumns.colorIdentity.toString())));
+            card.setType(cursor.getString(cursor.getColumnIndex(MTGCardSQLiteHelper.CardColumns.type.toString())));
             cards.add(card);
         }
 
