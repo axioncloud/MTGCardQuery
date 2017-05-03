@@ -7,7 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 
 import net.skyestudios.mtgcardquery.data.Card;
 
-public class CardViewActivity extends AppCompatActivity {
+public class CardViewActivity extends AppCompatActivity
+{
 
     public final static String VIEW_TYPE = "VIEW_TYPE";
     public final static String VIEW_CARD = "CARD";
@@ -18,7 +19,8 @@ public class CardViewActivity extends AppCompatActivity {
     private Card card;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+	{
         super.onCreate(savedInstanceState);
         cardViewIntent = getIntent();
         context = getApplicationContext();
@@ -27,15 +29,19 @@ public class CardViewActivity extends AppCompatActivity {
             setContentView(R.layout.layout_card_view);
         } else if (extras.getString(VIEW_TYPE).equals(VIEW_CARD_IMAGE)) {
             setContentView(R.layout.layout_card_image_view);
-        } else if ((card = (Card) extras.getSerializable(CARD)) == null) {
-            throw new IllegalArgumentException();
         } else {
+			throw new IllegalArgumentException();
+		}
+		
+		if ((card = (Card) extras.getSerializable(CARD)) == null)
+		{
             throw new IllegalArgumentException();
         }
         setup();
     }
 
-    private void setup() {
+    private void setup()
+	{
 
     }
 }
