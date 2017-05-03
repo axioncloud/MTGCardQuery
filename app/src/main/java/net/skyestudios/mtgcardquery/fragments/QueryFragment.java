@@ -155,8 +155,16 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
             cb_colorless1.setChecked(false);
         }
 
-        /***********************************************/
-
+        card_name_Query.setText("");
+        super_type_text.setText("");
+        subtype_text.setText("");
+        text_text.setText("");
+        power_spinner.setSelection(0);
+        power_number_spinner.setSelection(0);
+        tough_spinner.setSelection(0);
+        tough_number_spinner.setSelection(0);
+        cmc_spinner.setSelection(0);
+        cmc_number_spinner.setSelection(0);
     }
 
     @Override
@@ -297,7 +305,6 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
         openColorDialog.setOnClickListener(this);
         openColorIdentityDialog = (Button) getActivity().findViewById(R.id.button_openColorIdentityDialog);
         openColorIdentityDialog.setOnClickListener(this);
-        /************************************************/
         card_name_Query = (EditText) getActivity().findViewById(R.id.card_name_Query);
         super_type_text = (EditText) getActivity().findViewById(R.id.super_type_text);
         subtype_text = (EditText) getActivity().findViewById(R.id.subtype_text);
@@ -330,10 +337,10 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
     }
 
     private void buildQueryString() {
-        String name = card_name_Query.getText().toString();
-        String superType = super_type_text.getText().toString();
-        String subType = subtype_text.getText().toString();
-        String text = text_text.getText().toString();
+        String name = card_name_Query.getText().toString().trim();
+        String superType = super_type_text.getText().toString().trim();
+        String subType = subtype_text.getText().toString().trim();
+        String text = text_text.getText().toString().trim();
         String powerSym = power_spinner.getSelectedItem().toString();
         String powerNum = power_number_spinner.getSelectedItem().toString();
         String power;
@@ -402,7 +409,7 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
             color_blue = " AND colors IS NOT NULL ";
         }
         if(cb_colorless != null && cb_colorless.isChecked()){
-            color_colorless = " AND colors = ' ' ";
+            color_colorless = " AND colors = '' ";
         }else{
             color_colorless = " AND colors IS NOT NULL ";
         }
@@ -428,11 +435,11 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
         }
         if(cb_blue1 != null && cb_blue1.isChecked()){
             colorId_blue = " AND colorIdentity LIKE '%U%' ";
-        }else{
+        }else {
             colorId_blue = " AND colorIdentity IS NOT NULL ";
         }
         if(cb_colorless1 != null && cb_colorless1.isChecked()){
-            colorId_colorless = " AND colorIdentity =  ' ' ";
+            colorId_colorless = " AND colorIdentity =  '' ";
         }else{
             colorId_colorless = " AND colorIdentity IS NOT NULL ";
         }
@@ -466,7 +473,6 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
             cmc = " AND cmc IS NOT NULL ";
         }
             //force-update does not handle duplicates
-
             queryString = "SELECT * FROM " + MAIN_TABLE_NAME
                     + " WHERE " + name
                     + " AND " + superType
@@ -477,13 +483,13 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
                     + color_red
                     + color_black
                     + color_blue
-                    // + color_colorless //Need to figure value
+                    + color_colorless //Need to figure value
                     + colorId_white
                     + colorId_green
                     + colorId_red
                     + colorId_black
                     + colorId_blue
-                    // + colorId_colorless //Need to figure value
+                    + colorId_colorless //Need to figure value
                     + power
                     + tough
                     + cmc // '=' symbol returns 0 results
