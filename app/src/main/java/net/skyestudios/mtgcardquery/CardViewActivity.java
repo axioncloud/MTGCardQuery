@@ -22,7 +22,7 @@ public class CardViewActivity extends AppCompatActivity {
     TextView colors;
     TextView manaCost;
     TextView cmc;
-   // TextView types;
+    TextView types;
     TextView cardText;
     ImageView cardImageView;
     private Intent cardViewIntent;
@@ -60,10 +60,8 @@ public class CardViewActivity extends AppCompatActivity {
         manaCost.setText(card.getManaCost().toString());
         cmc = (TextView) this.findViewById(R.id.cmc_textView);
         cmc.setText(card.getCmc().toString());
-        /*types = (TextView) this.findViewById(R.id.types_textView);
-        String superType = card.getSupertypes().toString();
-        String subType = card.getSubtypes().toString();
-        types.setText(superType + " - " + subType);*/
+        types = (TextView) this.findViewById(R.id.types_textView);
+        types.setText(card.getType());
         cardText = (TextView) this.findViewById(R.id.cardText_textView);
         cardText.setText(card.getText());
         cardImageView = new ImageView(this);
