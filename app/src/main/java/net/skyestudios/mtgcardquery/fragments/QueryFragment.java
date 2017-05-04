@@ -371,9 +371,9 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
             name = "name IS NOT NULL";
         }
         if (!superType.isEmpty()) {
-            superType = "types LIKE '%" + superType + "%'";
+            superType = "type LIKE '%" + superType + "%'";
         } else {
-            superType = "types IS NOT NULL";
+            superType = "type IS NOT NULL";
         }
         if (!subType.isEmpty()) {
             subType = "subtypes LIKE '%" + subType + "%'";
@@ -466,7 +466,7 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
         }
         if (!cmcSym.isEmpty() && cmc_spinner.getSelectedItem() != null) {
             if (!cmcNum.isEmpty() && cmc_number_spinner.getSelectedItem() != null) {
-                cmc = " AND " + "cmc " + cmcSym + " " + cmcNum;
+                cmc = " AND " + "cmc " + cmcSym + " " + Double.parseDouble(cmcNum);
             } else {
                 cmc = " AND cmc IS NOT NULL ";
             }
