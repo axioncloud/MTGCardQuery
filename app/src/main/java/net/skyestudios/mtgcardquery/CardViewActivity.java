@@ -4,9 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import net.skyestudios.mtgcardquery.assets.AssetDownloader;
 import net.skyestudios.mtgcardquery.data.Card;
 
 public class CardViewActivity extends AppCompatActivity {
@@ -15,16 +18,16 @@ public class CardViewActivity extends AppCompatActivity {
     public final static String VIEW_CARD = "CARD";
     public final static String VIEW_CARD_IMAGE = "IMAGE";
     public static final String CARD = "CARD";
-    private Intent cardViewIntent;
-    private Context context;
-    private Card card;
-
     TextView name;
     TextView colors;
     TextView manaCost;
     TextView cmc;
    // TextView types;
     TextView cardText;
+    ImageView cardImageView;
+    private Intent cardViewIntent;
+    private Context context;
+    private Card card;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,5 +66,11 @@ public class CardViewActivity extends AppCompatActivity {
         types.setText(superType + " - " + subType);*/
         cardText = (TextView) this.findViewById(R.id.cardText_textView);
         cardText.setText(card.getText());
+        cardImageView = new ImageView(this);
+        cardImageView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        cardImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        cardImageView.setAdjustViewBounds(true);
+        new AssetDownloader(cardImageView).execute(card.getName());
+        ((LinearLayout) findViewById(R.id.card_details)).addView(cardImageView);
     }
 }
