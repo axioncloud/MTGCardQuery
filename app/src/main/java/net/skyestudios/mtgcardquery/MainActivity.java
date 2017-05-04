@@ -19,7 +19,6 @@ import android.widget.Toast;
 
 import net.skyestudios.mtgcardquery.data.Settings;
 import net.skyestudios.mtgcardquery.db.CloseDatabaseTask;
-import net.skyestudios.mtgcardquery.db.MTGCardDataSource;
 import net.skyestudios.mtgcardquery.db.OpenDatabaseTask;
 import net.skyestudios.mtgcardquery.fragments.DecksFragment;
 import net.skyestudios.mtgcardquery.fragments.QueryFragment;
@@ -32,7 +31,7 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private Settings settings;
+    public Settings settings;
     private Boolean backPressedOnce;
     private Toolbar toolbar;
     private DrawerLayout drawer;
@@ -42,7 +41,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FragmentManager fragmentManager;
     private Toast backPressedToast;
     private Handler handler;
-    private MTGCardDataSource mtgCardDataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

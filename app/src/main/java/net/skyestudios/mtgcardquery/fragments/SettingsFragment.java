@@ -16,6 +16,7 @@ import net.skyestudios.mtgcardquery.db.OpenDatabaseTask;
 
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.TimeZone;
 
 
 /**
@@ -25,6 +26,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
 
     private Settings settings;
     private TextView lastupdate_textview;
+    private String lastUpdate;
 
     /**
      * Fragments:
@@ -64,6 +66,12 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.button_forceupdate:
+                settings.setLastUpdateDate(new GregorianCalendar(TimeZone.getDefault()));
+                lastUpdate = String.format(Locale.US, "[%s/%s/%s]",
+                        settings.getLastUpdateDate().get(GregorianCalendar.MONTH) + 1,
+                        settings.getLastUpdateDate().get(GregorianCalendar.DAY_OF_MONTH),
+                        settings.getLastUpdateDate().get(GregorianCalendar.YEAR));
+                lastupdate_textview.setText(lastUpdate);
                 settings.recreateAssetProcessor();
                 settings.getAssetProcessor().setForcedUpdate();
                 new OpenDatabaseTask(settings.getMtgCardDataSource()).execute();
@@ -71,6 +79,12 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                 new CloseDatabaseTask(settings.getMtgCardDataSource()).execute();
                 break;
             case R.id.button_update:
+                settings.setLastUpdateDate(new GregorianCalendar(TimeZone.getDefault()));
+                lastUpdate = String.format(Locale.US, "[%s/%s/%s]",
+                        settings.getLastUpdateDate().get(GregorianCalendar.MONTH) + 1,
+                        settings.getLastUpdateDate().get(GregorianCalendar.DAY_OF_MONTH),
+                        settings.getLastUpdateDate().get(GregorianCalendar.YEAR));
+                lastupdate_textview.setText(lastUpdate);
                 settings.recreateAssetProcessor();
                 new OpenDatabaseTask(settings.getMtgCardDataSource()).execute();
                 settings.getAssetProcessor().execute();

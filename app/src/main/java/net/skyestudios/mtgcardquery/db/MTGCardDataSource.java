@@ -43,7 +43,7 @@ public class MTGCardDataSource {
             card.setType(cursor.getString(cursor.getColumnIndex(MTGCardSQLiteHelper.CardColumns.type.toString())));
             cards.add(card);
         }
-
+        cursor.close();
         return cards;
     }
 
@@ -102,6 +102,6 @@ public class MTGCardDataSource {
     }
 
     public void execRAWSQL(String sql) {
-        database.rawQuery(sql, null);
+        database.execSQL(sql);
     }
 }

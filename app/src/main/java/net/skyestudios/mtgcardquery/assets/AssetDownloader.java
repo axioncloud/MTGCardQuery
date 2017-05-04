@@ -71,8 +71,8 @@ public class AssetDownloader extends AsyncTask<String, Void, Bitmap> {
             in.close();
 
             //Parse Document page (response)
-            Document document = Jsoup.parse(response.toString());
-            String imageLocation = document.getElementsByAttributeValueMatching("src", "http://magiccards.info/scans").get(0).attr("src");
+            Document document = Jsoup.parse(response.toString().replaceAll("[\\u201C\\u201D]", "'"));
+            String imageLocation = document.getElementsByAttributeValueMatching("alt", "^" + params[0].replaceAll("[\"]", "") + "$").get(0).attr("src");
 
             URL imageurl = new URL(imageLocation);
             HttpURLConnection imageConnection = (HttpURLConnection) imageurl.openConnection();

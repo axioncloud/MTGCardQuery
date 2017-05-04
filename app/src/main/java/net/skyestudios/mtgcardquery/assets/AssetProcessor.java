@@ -45,6 +45,7 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
     private long allCardsFileLength;
     private ConnectivityManager connectivityManager;
     private NetworkInfo activeNetworkInfo;
+    private int cards;
 
     /**
      * Creates a new asynchronous task. This constructor must be invoked on the UI thread.
@@ -100,6 +101,7 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
      */
     @Override
     protected Void doInBackground(Void... params) {
+        cards = 0;
 
         if (!isCancelled() && activeNetworkInfo.isConnected()) {
             updateCards();
@@ -165,8 +167,8 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                     BOS.close();
                 }
             } else {
-                mtgCardDataSource.execRAWSQL("DELETE FROM " + MTGCardSQLiteHelper.MAIN_TABLE_NAME + ";");
-                mtgCardDataSource.execRAWSQL("DELETE FROM " + MTGCardSQLiteHelper.STAGING_TABLE_NAME + ";");
+                mtgCardDataSource.execRAWSQL("DROP TABLE " + MTGCardSQLiteHelper.MAIN_TABLE_NAME + ";");
+                mtgCardDataSource.execRAWSQL(MTGCardSQLiteHelper.createMainTableString());
                 versionFile.createNewFile();
                 downloadUpdate(versionFile, versionID);
                 isForcedUpdate = false;
@@ -527,9 +529,9 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                             try {
                                 Integer loyalty = jreader.nextInt();
                                 card.setLoyalty(loyalty);
-                            } catch (IllegalStateException e) {
-                                jreader.nextNull();
-                                card.setLoyalty(null);
+                            } catch (NumberFormatException e) {
+                                jreader.nextString();
+                                card.setLoyalty(0);
                             }
                             break;
                         case "hand":
@@ -557,6 +559,7 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
                             break;
                     }
                 }
+                cards++;
                 mtgCardDataSource.insertCard(card);
                 jreader.endObject();                            //End of Card Object
             }
