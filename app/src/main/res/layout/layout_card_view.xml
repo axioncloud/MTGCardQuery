@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_card_view"
     android:layout_width="match_parent"
@@ -16,120 +15,121 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true">
 
         <LinearLayout
+            android:id="@+id/card_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/name_label"
                     android:layout_width="154dp"
                     android:layout_height="wrap_content"
-                    android:id="@+id/name_label"
+                    android:text="Card Name:"
                     android:textSize="20sp"
-                    tools:text="Card Name:"
-                    android:text="Card Name:" />
+                    tools:text="Card Name:" />
 
                 <TextView
+                    android:id="@+id/name_textView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/name_textView"
                     android:textSize="20sp" />
             </LinearLayout>
 
             <TextView
+                android:id="@+id/Break"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/Break" />
+                android:layout_height="wrap_content" />
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:orientation="horizontal"
                 android:weightSum="1">
 
                 <TextView
-                    android:layout_height="wrap_content"
                     android:id="@+id/colors_label"
-                    android:textSize="20sp"
-                    tools:text="Colors:"
                     android:layout_width="156dp"
-                    android:text="Colors:" />
+                    android:layout_height="wrap_content"
+                    android:text="Colors:"
+                    android:textSize="20sp"
+                    tools:text="Colors:" />
 
                 <TextView
+                    android:id="@+id/colors_textView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/colors_textView"
                     android:textSize="20sp" />
             </LinearLayout>
 
             <TextView
+                android:id="@+id/Break1"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/Break1" />
+                android:layout_height="wrap_content" />
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
 
                 <TextView
-                    android:text="Mana Cost:"
+                    android:id="@+id/mana_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/mana_label"
+                    android:layout_weight="0.87"
+                    android:text="Mana Cost:"
                     android:textSize="20sp"
-                    tools:text="Mana Cost:"
-                    android:layout_weight="0.87" />
+                    tools:text="Mana Cost:" />
 
                 <TextView
+                    android:id="@+id/manaCost_textView"
                     android:layout_width="176dp"
                     android:layout_height="wrap_content"
-                    android:id="@+id/manaCost_textView"
                     android:layout_weight="0.30"
                     android:textSize="20sp" />
 
             </LinearLayout>
 
             <TextView
+                android:id="@+id/Break5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/Break5"
                 android:layout_weight="1" />
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/cmc_label"
                     android:layout_width="156dp"
                     android:layout_height="wrap_content"
-                    android:id="@+id/cmc_label"
+                    android:text="CMC:"
                     android:textSize="20sp"
-                    tools:text="CMC:"
-                    android:text="CMC:" />
+                    tools:text="CMC:" />
 
                 <TextView
+                    android:id="@+id/cmc_textView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/cmc_textView"
                     android:textSize="20sp" />
 
             </LinearLayout>
 
             <TextView
+                android:id="@+id/Break2"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/Break2" />
+                android:layout_height="wrap_content" />
 
            <!-- <LinearLayout
                 android:orientation="horizontal"
@@ -159,36 +159,36 @@
                 android:id="@+id/Break6" />
 
             <LinearLayout
-                android:orientation="horizontal"
+                android:layout_width="176dp"
                 android:layout_height="match_parent"
-                android:layout_width="176dp">
+                android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/cardText_label"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:id="@+id/cardText_label"
-                    android:textSize="20sp"
                     android:text="Card Text:"
+                    android:textSize="20sp"
                     tools:text="Card Text:" />
 
             </LinearLayout>
 
             <TextView
+                android:id="@+id/Break3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/Break3"
                 android:layout_weight="0.06" />
 
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="428dp">
+                android:layout_height="428dp"
+                android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/cardText_textView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/cardText_textView"
                     android:layout_weight="0.04"
                     android:textSize="20sp" />
 
