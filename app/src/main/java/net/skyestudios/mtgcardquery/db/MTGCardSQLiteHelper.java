@@ -13,43 +13,14 @@ public class MTGCardSQLiteHelper extends SQLiteOpenHelper {
 
     public static final String MAIN_TABLE_NAME = "MAINTABLE";
     public static final String STAGING_TABLE_NAME = "STAGINGTABLE";
-    private static final String DB_NAME = "cards.sqlite";
+    public static final String DB_NAME = "cards.sqlite";
 
     public MTGCardSQLiteHelper(Context context) {
         super(context, DB_NAME, null, 1);
     }
 
     @NonNull
-    private static String createMainTableString() {
-        return "CREATE TABLE " + MAIN_TABLE_NAME + " (" +
-                CardColumns.id + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
-                CardColumns.name + " TEXT , " +
-                CardColumns.layout + " TEXT , " +
-                CardColumns.cmc + " TEXT , " +
-                CardColumns.manaCost + " NUMERIC , " +
-                CardColumns.colors + " TEXT , " +
-                CardColumns.type + " TEXT , " +
-                CardColumns.types + " TEXT , " +
-                CardColumns.subtypes + " TEXT , " +
-                CardColumns.text + " TEXT , " +
-                CardColumns.power + " TEXT , " +
-                CardColumns.toughness + " TEXT , " +
-                CardColumns.imageName + " TEXT , " +
-                CardColumns.printings + " TEXT , " +
-                CardColumns.source + " TEXT , " +
-                CardColumns.rulings + " TEXT , " +
-                CardColumns.colorIdentity + " TEXT , " +
-                CardColumns.legalities + " TEXT , " +
-                CardColumns.supertypes + " TEXT , " +
-                CardColumns.starter + " TEXT , " +
-                CardColumns.loyalty + " INTEGER , " +
-                CardColumns.hand + " INTEGER , " +
-                CardColumns.life + " INTEGER , " +
-                CardColumns.names + " TEXT )";
-    }
-
-    @NonNull
-    public static String createStagingTableString() {
+    public static String createMainTableString() {
         return "CREATE TABLE " + MAIN_TABLE_NAME + " (" +
                 CardColumns.id + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 CardColumns.name + " TEXT , " +

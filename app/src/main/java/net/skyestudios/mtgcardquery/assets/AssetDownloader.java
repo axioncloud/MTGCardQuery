@@ -1,11 +1,15 @@
 package net.skyestudios.mtgcardquery.assets;
 
-import android.app.Activity;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.widget.ImageView;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -13,22 +17,16 @@ import java.net.URL;
 /**
  * Created by arkeonet64 on 3/6/2017.
  */
-public class AssetDownloader extends AsyncTask<Void, Void, Void> {
-    private String html;
-    private BitmapDrawable drawable;
-    private Activity activity;
+public class AssetDownloader extends AsyncTask<String, Void, Bitmap> {
+    private final ImageView imageView;
 
     /**
      * Creates a new asynchronous task. This constructor must be invoked on the UI thread.
+     * @param cardImageView
      */
-    public AssetDownloader(String html, Activity activity) {
+    public AssetDownloader(ImageView cardImageView) {
         super();
-        this.html = html;
-        this.activity = activity;
-    }
-
-    public Drawable getDrawable() {
-        return drawable;
+        imageView = cardImageView;
     }
 
     /**
@@ -46,12 +44,13 @@ public class AssetDownloader extends AsyncTask<Void, Void, Void> {
      * @see #publishProgress
      */
     @Override
-    protected Void doInBackground(Void... params) {
+    protected Bitmap doInBackground(String... params) {
         try {
-            String url = "http://magiccards.info/query?q=" + "Akroma's+Memorial";
+            String cardString = params[0].replace(' ', '+');
+            String url = "http://magiccards.info/query?q=" + cardString;
 
-            URL obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            URL pageurl = new URL(url);
+            HttpURLConnection con = (HttpURLConnection) pageurl.openConnection();
 
             // optional default is GET
             con.setRequestMethod("GET");
@@ -72,7 +71,14 @@ public class AssetDownloader extends AsyncTask<Void, Void, Void> {
             in.close();
 
             //Parse Document page (response)
-            return null;
+            Document document = Jsoup.parse(response.toString().replaceAll("[\\u201C\\u201D]", "'"));
+            String imageLocation = document.getElementsByAttributeValueMatching("alt", "^" + params[0].replaceAll("[\"]", "") + "$").get(0).attr("src");
+
+            URL imageurl = new URL(imageLocation);
+            HttpURLConnection imageConnection = (HttpURLConnection) imageurl.openConnection();
+            InputStream imageStream = imageConnection.getInputStream();
+
+            return BitmapFactory.decodeStream(imageStream);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -85,54 +91,15 @@ public class AssetDownloader extends AsyncTask<Void, Void, Void> {
      * <p>
      * <p>This method won't be invoked if the task was cancelled.</p>
      *
-     * @param aVoid The result of the operation computed by {@link #doInBackground}.
+     * @param bitmap The result of the operation computed by {@link #doInBackground}.
      * @see #onPreExecute
      * @see #doInBackground
      * @see #onCancelled(Object)
      */
     @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
-
-        /*((ImageView) activity.findViewById(R.id.cardImage_ImageView)).setImageDrawable(drawable);
-
-        final File DCIM_Directory = new File(Environment
-                .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
-                activity.getString(R.string.app_name));
-        if (!DCIM_Directory.exists()) {
-            DCIM_Directory.mkdirs();
-        }
-
-        //Save image to MTG Card Query's DCIM directory
-        activity.findViewById(R.id.cardImage_ImageView).setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                try {
-                    File savedImage = new File(DCIM_Directory, "Akroma's Memorial.png");
-                    savedImage.createNewFile();
-                    FileOutputStream FOS = new FileOutputStream(savedImage);
-                    Bitmap bitmap = drawable.getBitmap();
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, FOS);
-                    FOS.flush();
-                    FOS.close();
-                    Toast.makeText(activity, "Image: {" + savedImage.getName() + "} saved", Toast.LENGTH_LONG).show();
-
-                    ContentValues values = new ContentValues();
-                    values.put(MediaStore.Images.Media.TITLE, savedImage.getName());
-                    values.put(MediaStore.Images.Media.DESCRIPTION, "A MTG Card");
-                    values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
-                    values.put(MediaStore.Images.ImageColumns.BUCKET_ID, savedImage.getName().toLowerCase().hashCode());
-                    values.put(MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME, savedImage.getName().toLowerCase());
-                    values.put(MediaStore.Images.ImageColumns.TITLE, savedImage.getName());
-                    values.put("_data", savedImage.getAbsolutePath());
-
-                    ContentResolver contentResolver = activity.getContentResolver();
-                    contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return false;
-            }
-        });*/
+    protected void onPostExecute(Bitmap bitmap) {
+        super.onPostExecute(bitmap);
+        imageView.setImageBitmap(bitmap);
+        imageView.invalidate();
     }
 }

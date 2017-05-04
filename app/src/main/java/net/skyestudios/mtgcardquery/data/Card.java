@@ -1,10 +1,12 @@
 package net.skyestudios.mtgcardquery.data;
 
+import java.io.Serializable;
+
 /**
  * Created by arkeonet64 on 4/4/2017.
  */
 
-public class Card {
+public class Card implements Serializable {
     private String name;
     private String layout;
     private String colors;
@@ -53,6 +55,35 @@ public class Card {
         hand = 0;
         life = 0;
         names = "";
+    }
+
+    @Override
+    public String toString() {
+        return "Card{" +
+                "name='" + name + '\'' +
+                ", layout='" + layout + '\'' +
+                ", colors='" + colors + '\'' +
+                ", cmc=" + cmc +
+                ", manaCost='" + manaCost + '\'' +
+                ", type='" + type + '\'' +
+                ", types='" + types + '\'' +
+                ", subtypes='" + subtypes + '\'' +
+                ", text='" + text + '\'' +
+                ", power='" + power + '\'' +
+                ", toughness='" + toughness + '\'' +
+                ", imageName='" + imageName + '\'' +
+                ", printings='" + printings + '\'' +
+                ", source='" + source + '\'' +
+                ", rulings='" + rulings + '\'' +
+                ", colorIdentity='" + colorIdentity + '\'' +
+                ", legalities='" + legalities + '\'' +
+                ", supertypes='" + supertypes + '\'' +
+                ", starter=" + starter +
+                ", loyalty=" + loyalty +
+                ", hand=" + hand +
+                ", life=" + life +
+                ", names='" + names + '\'' +
+                '}';
     }
 
     public String getName() {
