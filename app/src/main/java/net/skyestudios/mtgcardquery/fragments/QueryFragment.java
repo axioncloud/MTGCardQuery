@@ -17,8 +17,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
+import net.skyestudios.mtgcardquery.MainActivity;
 import net.skyestudios.mtgcardquery.R;
 import net.skyestudios.mtgcardquery.ResultsActivity;
 
@@ -326,12 +326,14 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
                 colorDialog.show();
                 break;
             case R.id.button_openColorIdentityDialog:
-               colorIdentityDialog.show();
+                colorIdentityDialog.show();
                 break;
             case R.id.button_query:
-                buildQueryString();
-                resultsIntent.putExtra("queryString", queryString);
-                startActivity(resultsIntent);
+                if (!((MainActivity) getActivity()).settings.getAssetProcessor().isRunning()) {
+                    buildQueryString();
+                    resultsIntent.putExtra("queryString", queryString);
+                    startActivity(resultsIntent);
+                }
                 break;
         }
     }
@@ -363,137 +365,136 @@ public class QueryFragment extends Fragment implements View.OnClickListener {
         String colorId_blue = "";
         String colorId_colorless = "";
 
-        if(!name.isEmpty()){
+        if (!name.isEmpty()) {
             name = "name LIKE '%" + name + "%'";
-        }else{
-            name ="name IS NOT NULL";
+        } else {
+            name = "name IS NOT NULL";
         }
-        if(!superType.isEmpty()){
+        if (!superType.isEmpty()) {
             superType = "types LIKE '%" + superType + "%'";
-        }else{
+        } else {
             superType = "types IS NOT NULL";
         }
-        if(!subType.isEmpty()){
+        if (!subType.isEmpty()) {
             subType = "subtypes LIKE '%" + subType + "%'";
-        }else{
+        } else {
             subType = "subtypes IS NOT NULL";
         }
-        if(!text.isEmpty()){
+        if (!text.isEmpty()) {
             text = "text LIKE '%" + text + "%'";
-        }else{
+        } else {
             text = "text IS NOT NULL";
         }
-        if(cb_white != null && cb_white.isChecked()){
+        if (cb_white != null && cb_white.isChecked()) {
             color_white = " AND colors LIKE '%White%' ";
-        }else{
+        } else {
             color_white = " AND colors IS NOT NULL ";
         }
-        if(cb_green != null && cb_green.isChecked()){
-           color_green = " AND colors LIKE '%Green%' ";
-        }else{
+        if (cb_green != null && cb_green.isChecked()) {
+            color_green = " AND colors LIKE '%Green%' ";
+        } else {
             color_green = " AND colors IS NOT NULL ";
         }
-        if(cb_red != null && cb_red.isChecked()){
+        if (cb_red != null && cb_red.isChecked()) {
             color_red = " AND colors LIKE '%Red%' ";
-        }else{
+        } else {
             color_red = " AND colors IS NOT NULL ";
         }
-        if(cb_black != null && cb_black.isChecked()){
+        if (cb_black != null && cb_black.isChecked()) {
             color_black = " AND colors LIKE '%Black%' ";
-        }else{
+        } else {
             color_black = " AND colors IS NOT NULL ";
         }
-        if(cb_blue != null && cb_blue.isChecked()){
+        if (cb_blue != null && cb_blue.isChecked()) {
             color_blue = " AND colors LIKE '%Blue%' ";
-        }else{
+        } else {
             color_blue = " AND colors IS NOT NULL ";
         }
-        if(cb_colorless != null && cb_colorless.isChecked()){
+        if (cb_colorless != null && cb_colorless.isChecked()) {
             color_colorless = " AND colors = '' ";
-        }else{
+        } else {
             color_colorless = " AND colors IS NOT NULL ";
         }
-        if(cb_white1 != null && cb_white1.isChecked()){
+        if (cb_white1 != null && cb_white1.isChecked()) {
             colorId_white = " AND colorIdentity LIKE '%W%' ";
-        }else{
+        } else {
             colorId_white = " AND colorIdentity IS NOT NULL ";
         }
-        if(cb_green1 != null && cb_green1.isChecked()){
+        if (cb_green1 != null && cb_green1.isChecked()) {
             colorId_green = " AND colorIdentity LIKE '%G%' ";
-        }else{
+        } else {
             colorId_green = " AND colorIdentity IS NOT NULL ";
         }
-        if(cb_red1 != null && cb_red1.isChecked()){
+        if (cb_red1 != null && cb_red1.isChecked()) {
             colorId_red = " AND colorIdentity LIKE '%R%' ";
-        }else{
+        } else {
             colorId_red = " AND colorIdentity IS NOT NULL ";
         }
-        if(cb_black1 != null && cb_black1.isChecked()){
+        if (cb_black1 != null && cb_black1.isChecked()) {
             colorId_black = " AND colorIdentity LIKE '%B%' ";
-        }else{
+        } else {
             colorId_black = " AND colorIdentity IS NOT NULL ";
         }
-        if(cb_blue1 != null && cb_blue1.isChecked()){
+        if (cb_blue1 != null && cb_blue1.isChecked()) {
             colorId_blue = " AND colorIdentity LIKE '%U%' ";
-        }else {
+        } else {
             colorId_blue = " AND colorIdentity IS NOT NULL ";
         }
-        if(cb_colorless1 != null && cb_colorless1.isChecked()){
+        if (cb_colorless1 != null && cb_colorless1.isChecked()) {
             colorId_colorless = " AND colorIdentity =  '' ";
-        }else{
+        } else {
             colorId_colorless = " AND colorIdentity IS NOT NULL ";
         }
-        if(!powerSym.isEmpty() && power_spinner.getSelectedItem() != null ) {
+        if (!powerSym.isEmpty() && power_spinner.getSelectedItem() != null) {
             if (!powerNum.isEmpty() && power_number_spinner.getSelectedItem() != null) {
                 power = " AND " + "power " + powerSym + " " + powerNum;
-            }
-            else{
+            } else {
                 power = " AND power IS NOT NULL ";
             }
-        }else{
+        } else {
             power = " AND power IS NOT NULL ";
         }
-        if(!toughSym.isEmpty() && tough_spinner.getSelectedItem() != null ){
-            if(!toughNum.isEmpty() && tough_number_spinner.getSelectedItem() != null ){
+        if (!toughSym.isEmpty() && tough_spinner.getSelectedItem() != null) {
+            if (!toughNum.isEmpty() && tough_number_spinner.getSelectedItem() != null) {
 
                 tough = " AND " + "toughness " + toughSym + " " + toughNum;
-            }else{
+            } else {
                 tough = " AND toughness IS NOT NULL ";
             }
-        }else{
+        } else {
             tough = " AND toughness IS NOT NULL ";
         }
-        if(!cmcSym.isEmpty() && cmc_spinner.getSelectedItem() != null ){
-            if(!cmcNum.isEmpty() && cmc_number_spinner.getSelectedItem() != null ){
+        if (!cmcSym.isEmpty() && cmc_spinner.getSelectedItem() != null) {
+            if (!cmcNum.isEmpty() && cmc_number_spinner.getSelectedItem() != null) {
                 cmc = " AND " + "cmc " + cmcSym + " " + cmcNum;
-            }else{
+            } else {
                 cmc = " AND cmc IS NOT NULL ";
             }
-        }else{
+        } else {
             cmc = " AND cmc IS NOT NULL ";
         }
-            //force-update does not handle duplicates
-            queryString = "SELECT * FROM " + MAIN_TABLE_NAME
-                    + " WHERE " + name
-                    + " AND " + superType
-                    + " AND " + subType
-                    + " AND " + text
-                    + color_white
-                    + color_green
-                    + color_red
-                    + color_black
-                    + color_blue
-                    + color_colorless //Need to figure value
-                    + colorId_white
-                    + colorId_green
-                    + colorId_red
-                    + colorId_black
-                    + colorId_blue
-                    + colorId_colorless //Need to figure value
-                    + power
-                    + tough
-                    + cmc // '=' symbol returns 0 results
-                    + " ORDER BY name ASC;";
+        //force-update does not handle duplicates
+        queryString = "SELECT * FROM " + MAIN_TABLE_NAME
+                + " WHERE " + name
+                + " AND " + superType
+                + " AND " + subType
+                + " AND " + text
+                + color_white
+                + color_green
+                + color_red
+                + color_black
+                + color_blue
+                + color_colorless //Need to figure value
+                + colorId_white
+                + colorId_green
+                + colorId_red
+                + colorId_black
+                + colorId_blue
+                + colorId_colorless //Need to figure value
+                + power
+                + tough
+                + cmc // '=' symbol returns 0 results
+                + " ORDER BY name ASC;";
 
     }
 

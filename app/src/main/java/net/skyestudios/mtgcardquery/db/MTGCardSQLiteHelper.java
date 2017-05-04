@@ -20,37 +20,8 @@ public class MTGCardSQLiteHelper extends SQLiteOpenHelper {
     }
 
     @NonNull
-    private static String createMainTableString() {
+    public static String createMainTableString() {
         return "CREATE TABLE " + MAIN_TABLE_NAME + " (" +
-                CardColumns.id + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
-                CardColumns.name + " TEXT , " +
-                CardColumns.layout + " TEXT , " +
-                CardColumns.cmc + " TEXT , " +
-                CardColumns.manaCost + " NUMERIC , " +
-                CardColumns.colors + " TEXT , " +
-                CardColumns.type + " TEXT , " +
-                CardColumns.types + " TEXT , " +
-                CardColumns.subtypes + " TEXT , " +
-                CardColumns.text + " TEXT , " +
-                CardColumns.power + " TEXT , " +
-                CardColumns.toughness + " TEXT , " +
-                CardColumns.imageName + " TEXT , " +
-                CardColumns.printings + " TEXT , " +
-                CardColumns.source + " TEXT , " +
-                CardColumns.rulings + " TEXT , " +
-                CardColumns.colorIdentity + " TEXT , " +
-                CardColumns.legalities + " TEXT , " +
-                CardColumns.supertypes + " TEXT , " +
-                CardColumns.starter + " TEXT , " +
-                CardColumns.loyalty + " INTEGER , " +
-                CardColumns.hand + " INTEGER , " +
-                CardColumns.life + " INTEGER , " +
-                CardColumns.names + " TEXT )";
-    }
-
-    @NonNull
-    public static String createStagingTableString() {
-        return "CREATE TABLE " + STAGING_TABLE_NAME + " (" +
                 CardColumns.id + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 CardColumns.name + " TEXT , " +
                 CardColumns.layout + " TEXT , " +
@@ -80,8 +51,6 @@ public class MTGCardSQLiteHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         String sql = createMainTableString();
-        sqLiteDatabase.execSQL(sql);
-        sql = createStagingTableString();
         sqLiteDatabase.execSQL(sql);
     }
 

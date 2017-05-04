@@ -2,7 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="140dp">
+    android:layout_height="140dp"
+    android:layout_gravity="center_vertical"
+    android:gravity="center_vertical">
 
     <TextView
         android:id="@+id/card_name"
@@ -11,9 +13,9 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_toStartOf="@+id/card_mana_cost"
         android:paddingLeft="4dp"
-        android:textSize="30sp"
+        android:singleLine="true"
+        android:textSize="24sp"
         tools:text="Card Name" />
 
     <TextView
@@ -23,8 +25,12 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/card_name"
+        android:gravity="right"
         android:paddingRight="4dp"
-        android:textSize="30sp"
+        android:singleLine="true"
+        android:textAlignment="textEnd"
+        android:textSize="24sp"
         tools:text="{6}{G}{G}" />
 
     <TextView
@@ -33,7 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/card_name"
         android:paddingLeft="8dp"
-        android:textSize="24sp"
+        android:textSize="18sp"
         tools:text="Creature - Wall" />
 
     <TextView
