@@ -18,20 +18,19 @@
         android:textSize="24sp"
         tools:text="Card Name" />
 
-    <TextView
+    <LinearLayout
         android:id="@+id/card_mana_cost"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/card_name"
+        android:layout_alignParentBottom="false"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/card_name"
-        android:gravity="right"
-        android:paddingRight="4dp"
-        android:singleLine="true"
-        android:textAlignment="textEnd"
-        android:textSize="24sp"
-        tools:text="{6}{G}{G}" />
+        android:gravity="right|end"
+        android:orientation="horizontal"
+        android:paddingRight="4dp" />
 
     <TextView
         android:id="@+id/card_type"
