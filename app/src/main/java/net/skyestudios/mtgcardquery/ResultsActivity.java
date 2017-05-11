@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -32,6 +33,7 @@ public class ResultsActivity extends AppCompatActivity implements AdapterView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_results);
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         queryString = getIntent().getStringExtra("queryString");
         waitingDialog = new ProgressDialog(this);
         waitingDialog.setIndeterminate(false);

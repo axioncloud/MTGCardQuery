@@ -25,14 +25,13 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:layout_height="match_parent">
 
                 <TextView
                     android:id="@+id/name_label"
-                    android:layout_width="154dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Card Name:"
                     android:textSize="20sp"
@@ -40,51 +39,43 @@
 
                 <TextView
                     android:id="@+id/name_textView"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_toRightOf="@+id/name_label"
+                    android:paddingLeft="60dp"
                     android:textSize="20sp" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/Break"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:weightSum="1">
 
                 <TextView
                     android:id="@+id/colors_label"
-                    android:layout_width="156dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignRight="@+id/name_label"
+                    android:layout_below="@+id/name_label"
                     android:text="Colors:"
                     android:textSize="20sp"
                     tools:text="Colors:" />
 
                 <TextView
                     android:id="@+id/colors_textView"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/name_textView"
+                    android:layout_toRightOf="@+id/colors_label"
+                    android:paddingLeft="60dp"
                     android:textSize="20sp" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/Break1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/mana_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignRight="@+id/name_label"
+                    android:layout_below="@+id/colors_label"
                     android:layout_weight="0.87"
                     android:text="Mana Cost:"
                     android:textSize="20sp"
@@ -92,108 +83,82 @@
 
                 <TextView
                     android:id="@+id/manaCost_textView"
-                    android:layout_width="176dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/colors_textView"
+                    android:layout_toRightOf="@+id/mana_label"
                     android:layout_weight="0.30"
+                    android:paddingLeft="60dp"
                     android:textSize="20sp" />
-
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/Break5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/cmc_label"
-                    android:layout_width="156dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignRight="@+id/name_label"
+                    android:layout_below="@+id/mana_label"
                     android:text="CMC:"
                     android:textSize="20sp"
                     tools:text="CMC:" />
 
                 <TextView
                     android:id="@+id/cmc_textView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="20sp" />
-
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/Break2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-           <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <TextView
-                    android:text="Types:"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/types_lable"
-                    android:layout_weight="2.10"
-                    tools:text="Types"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/manaCost_textView"
+                    android:layout_toRightOf="@+id/cmc_label"
+                    android:paddingLeft="60dp"
                     android:textSize="20sp" />
 
                 <TextView
+                    android:id="@+id/types_lable"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignRight="@+id/name_label"
+                    android:layout_below="@+id/cmc_label"
+                    android:layout_weight="2.10"
+                    android:text="Types:"
+                    android:textSize="20sp"
+                    tools:text="Types" />
+
+                <TextView
+                    android:id="@+id/types_textView"
                     android:layout_width="176dp"
                     android:layout_height="wrap_content"
-                    android:id="@+id/types_textView"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/cmc_textView"
+                    android:layout_toRightOf="@+id/types_lable"
                     android:layout_weight="0.38"
+                    android:paddingLeft="60dp"
                     android:textSize="20sp" />
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/Break6" />
-
-            <LinearLayout
-                android:layout_width="176dp"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/cardText_label"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignRight="@+id/name_label"
+                    android:layout_below="@+id/types_lable"
                     android:layout_weight="1"
                     android:text="Card Text:"
                     android:textSize="20sp"
                     tools:text="Card Text:" />
 
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/Break3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.06" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:orientation="vertical">
-
                 <TextView
                     android:id="@+id/cardText_textView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_below="@+id/cardText_label"
                     android:layout_weight="0.04"
                     android:textSize="20sp" />
-
-            </LinearLayout>
+            </RelativeLayout>
 
         </LinearLayout>
     </ScrollView>

@@ -18,6 +18,7 @@ android {
     }
     productFlavors {
         Alpha {
+            vectorDrawables.useSupportLibrary = true
             minSdkVersion 16
             applicationId 'net.skyestudios.mtgcardquery'
             targetSdkVersion 25
