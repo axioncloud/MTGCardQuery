@@ -338,19 +338,29 @@ public class CardViewAdapter extends ArrayAdapter<CardView> {
                     break;
 
                 case "{B/G}":
-                    break;
-                case "{B/U}":
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        manaImageView.setImageDrawable(getContext().getDrawable(R.drawable.ic_bg));
+                    } else {
+                        manaImageView.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_bg));
+                    }
+                    manaCostHolder.addView(manaImageView);
                     break;
                 case "{B/R}":
-                    break;
-                case "{B/W}":
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        manaImageView.setImageDrawable(getContext().getDrawable(R.drawable.ic_br));
+                    } else {
+                        manaImageView.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_br));
+                    }
+                    manaCostHolder.addView(manaImageView);
                     break;
 
-                case "{G/B}":
-                    break;
                 case "{G/U}":
-                    break;
-                case "{G/R}":
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        manaImageView.setImageDrawable(getContext().getDrawable(R.drawable.ic_gu));
+                    } else {
+                        manaImageView.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_gu));
+                    }
+                    manaCostHolder.addView(manaImageView);
                     break;
                 case "{G/W}":
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -361,13 +371,55 @@ public class CardViewAdapter extends ArrayAdapter<CardView> {
                     manaCostHolder.addView(manaImageView);
                     break;
 
-                case "{U/G}":
-                    break;
                 case "{U/B}":
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        manaImageView.setImageDrawable(getContext().getDrawable(R.drawable.ic_ub));
+                    } else {
+                        manaImageView.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_ub));
+                    }
+                    manaCostHolder.addView(manaImageView);
                     break;
                 case "{U/R}":
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        manaImageView.setImageDrawable(getContext().getDrawable(R.drawable.ic_ur));
+                    } else {
+                        manaImageView.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_ur));
+                    }
+                    manaCostHolder.addView(manaImageView);
                     break;
-                case "{U/W}":
+
+                case "{R/G}":
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        manaImageView.setImageDrawable(getContext().getDrawable(R.drawable.ic_rg));
+                    } else {
+                        manaImageView.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_rg));
+                    }
+                    manaCostHolder.addView(manaImageView);
+                    break;
+                case "{R/W}":
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        manaImageView.setImageDrawable(getContext().getDrawable(R.drawable.ic_rw));
+                    } else {
+                        manaImageView.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_rw));
+                    }
+                    manaCostHolder.addView(manaImageView);
+                    break;
+
+                case "{W/B}":
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        manaImageView.setImageDrawable(getContext().getDrawable(R.drawable.ic_wb));
+                    } else {
+                        manaImageView.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_wb));
+                    }
+                    manaCostHolder.addView(manaImageView);
+                    break;
+                case "{W/U}":
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        manaImageView.setImageDrawable(getContext().getDrawable(R.drawable.ic_rw));
+                    } else {
+                        manaImageView.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_rw));
+                    }
+                    manaCostHolder.addView(manaImageView);
                     break;
                 default:
                     break;
