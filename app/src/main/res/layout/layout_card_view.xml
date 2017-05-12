@@ -42,6 +42,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
+                    android:layout_marginBottom="10dp"
                     android:layout_toRightOf="@+id/name_label"
                     android:paddingLeft="60dp"
                     android:textSize="20sp" />
@@ -53,7 +54,7 @@
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:layout_alignRight="@+id/name_label"
-                    android:layout_below="@+id/name_label"
+                    android:layout_below="@+id/name_textView"
                     android:text="Colors:"
                     android:textSize="20sp"
                     tools:text="Colors:" />
@@ -64,6 +65,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_below="@+id/name_textView"
+                    android:layout_marginBottom="10dp"
                     android:layout_toRightOf="@+id/colors_label"
                     android:paddingLeft="60dp"
                     android:textSize="20sp" />
@@ -75,22 +77,22 @@
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:layout_alignRight="@+id/name_label"
-                    android:layout_below="@+id/colors_label"
+                    android:layout_below="@+id/colors_textView"
                     android:layout_weight="0.87"
                     android:text="Mana Cost:"
                     android:textSize="20sp"
                     tools:text="Mana Cost:" />
 
-                <TextView
-                    android:id="@+id/manaCost_textView"
+                <LinearLayout
+                    android:id="@+id/manaCost_container"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/mana_label"
                     android:layout_alignParentRight="true"
                     android:layout_below="@+id/colors_textView"
                     android:layout_toRightOf="@+id/mana_label"
-                    android:layout_weight="0.30"
-                    android:paddingLeft="60dp"
-                    android:textSize="20sp" />
+                    android:gravity="left|center_vertical"
+                    android:paddingLeft="60dp" />
 
                 <TextView
                     android:id="@+id/cmc_label"
@@ -99,7 +101,8 @@
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:layout_alignRight="@+id/name_label"
-                    android:layout_below="@+id/mana_label"
+                    android:layout_below="@+id/manaCost_container"
+                    android:layout_marginTop="10dp"
                     android:text="CMC:"
                     android:textSize="20sp"
                     tools:text="CMC:" />
@@ -109,19 +112,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:layout_below="@+id/manaCost_textView"
+                    android:layout_below="@+id/manaCost_container"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
                     android:layout_toRightOf="@+id/cmc_label"
                     android:paddingLeft="60dp"
                     android:textSize="20sp" />
 
                 <TextView
-                    android:id="@+id/types_lable"
+                    android:id="@+id/types_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:layout_alignRight="@+id/name_label"
-                    android:layout_below="@+id/cmc_label"
+                    android:layout_below="@+id/cmc_textView"
                     android:layout_weight="2.10"
                     android:text="Types:"
                     android:textSize="20sp"
@@ -133,7 +138,8 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_below="@+id/cmc_textView"
-                    android:layout_toRightOf="@+id/types_lable"
+                    android:layout_marginBottom="10dp"
+                    android:layout_toRightOf="@+id/types_label"
                     android:layout_weight="0.38"
                     android:paddingLeft="60dp"
                     android:textSize="20sp" />
@@ -145,7 +151,7 @@
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:layout_alignRight="@+id/name_label"
-                    android:layout_below="@+id/types_lable"
+                    android:layout_below="@+id/types_textView"
                     android:layout_weight="1"
                     android:text="Card Text:"
                     android:textSize="20sp"
@@ -156,6 +162,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/cardText_label"
+                    android:layout_marginBottom="10dp"
                     android:layout_weight="0.04"
                     android:textSize="20sp" />
             </RelativeLayout>

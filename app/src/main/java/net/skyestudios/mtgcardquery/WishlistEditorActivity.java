@@ -3,7 +3,7 @@ package net.skyestudios.mtgcardquery;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-public class WishlistsViewActivity extends AppCompatActivity {
+public class WishlistEditorActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

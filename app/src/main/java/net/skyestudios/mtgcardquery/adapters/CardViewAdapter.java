@@ -3,6 +3,7 @@ package net.skyestudios.mtgcardquery.adapters;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,6 +67,8 @@ public class CardViewAdapter extends ArrayAdapter<CardView> {
         for (String manaCostToken :
                 manaCostTokens) {
             ImageView manaImageView = new ImageView(getContext());
+
+            manaImageView.setPadding(0, 0, ((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getContext().getResources().getDisplayMetrics())), 0);
 
             switch (manaCostToken) {
                 case "{0}":

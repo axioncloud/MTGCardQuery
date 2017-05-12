@@ -23,7 +23,7 @@ import net.skyestudios.mtgcardquery.db.OpenDatabaseTask;
 import net.skyestudios.mtgcardquery.fragments.DecksFragment;
 import net.skyestudios.mtgcardquery.fragments.QueryFragment;
 import net.skyestudios.mtgcardquery.fragments.SettingsFragment;
-import net.skyestudios.mtgcardquery.fragments.WishlistFragment;
+import net.skyestudios.mtgcardquery.fragments.WishlistsFragment;
 
 import java.io.File;
 import java.io.IOException;
@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.item_wishlists:
                 toolbar.setTitle(getString(R.string.app_name) + ": Wishlists");
-                fragment = new WishlistFragment();
+                fragment = new WishlistsFragment();
                 fragmentManager.beginTransaction().addToBackStack(null).replace(R.id.fragment_container, fragment).commit();
                 break;
             case R.id.item_settings:
