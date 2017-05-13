@@ -1,5 +1,6 @@
 package net.skyestudios.mtgcardquery.fragments;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -63,8 +65,15 @@ public class WishlistsFragment extends Fragment implements View.OnClickListener,
                         .setPositiveButton("Create", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                arrayAdapter.add(wishlistName.getText().toString());
-                                arrayAdapter.notifyDataSetChanged();
+                                if (wishlistName.getText().toString().equals("")) {
+
+                                } else {
+                                    arrayAdapter.add(wishlistName.getText().toString());
+                                    arrayAdapter.notifyDataSetChanged();
+                                    InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                    imm.hideSoftInputFromWindow(wishlistName.getWindowToken(), 0);
+                                    dialogInterface.dismiss();
+                                }
                             }
                         })
                         .show();
@@ -74,6 +83,6 @@ public class WishlistsFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
+        //TODO: Start WishlistEditorActivity with wishlist number
     }
 }
