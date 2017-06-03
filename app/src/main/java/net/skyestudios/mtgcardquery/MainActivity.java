@@ -20,6 +20,7 @@ import android.widget.Toast;
 import net.skyestudios.mtgcardquery.data.Settings;
 import net.skyestudios.mtgcardquery.db.CloseDatabaseTask;
 import net.skyestudios.mtgcardquery.db.OpenDatabaseTask;
+import net.skyestudios.mtgcardquery.fragments.AboutFragment;
 import net.skyestudios.mtgcardquery.fragments.DecksFragment;
 import net.skyestudios.mtgcardquery.fragments.QueryFragment;
 import net.skyestudios.mtgcardquery.fragments.SettingsFragment;
@@ -143,6 +144,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.item_decks:
                 toolbar.setTitle(getString(R.string.app_name) + ": Decks");
                 fragment = new DecksFragment();
+                fragmentManager.beginTransaction().addToBackStack(null).replace(R.id.fragment_container, fragment).commit();
+                break;
+            case R.id.item_about:
+                toolbar.setTitle(getString(R.string.app_name) + ": About");
+                fragment = new AboutFragment();
                 fragmentManager.beginTransaction().addToBackStack(null).replace(R.id.fragment_container, fragment).commit();
                 break;
             default:

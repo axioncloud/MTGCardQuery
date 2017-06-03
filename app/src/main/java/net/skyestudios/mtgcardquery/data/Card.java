@@ -58,6 +58,11 @@ public class Card implements Serializable {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        return this.name.equals(((Card) obj).getName());
+    }
+
+    @Override
     public String toString() {
         return "Card{" +
                 "name='" + name + '\'' +

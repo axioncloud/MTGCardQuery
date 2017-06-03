@@ -54,7 +54,7 @@ public class ResultsActivity extends AppCompatActivity implements AdapterView.On
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         cardViewIntent.putExtra(CardViewActivity.VIEW_TYPE, CardViewActivity.VIEW_CARD);
         cardViewIntent.putExtra(CardViewActivity.CARD, cards.get(i));
-		startActivity(cardViewIntent);
+        startActivityForResult(cardViewIntent, 0);
     }
 
 

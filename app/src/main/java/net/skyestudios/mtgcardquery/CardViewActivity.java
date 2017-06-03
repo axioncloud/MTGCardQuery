@@ -1,11 +1,17 @@
 package net.skyestudios.mtgcardquery;
 
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -13,7 +19,16 @@ import android.widget.TextView;
 
 import net.skyestudios.mtgcardquery.assets.AssetDownloader;
 import net.skyestudios.mtgcardquery.data.Card;
+import net.skyestudios.mtgcardquery.data.Wishlist;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class CardViewActivity extends AppCompatActivity {
@@ -29,15 +44,37 @@ public class CardViewActivity extends AppCompatActivity {
     TextView types;
     TextView cardText;
     ImageView cardImageView;
+    Toolbar toolbar;
+    List<String> wishlistNames;
     private Intent cardViewIntent;
     private Context context;
     private Card card;
+    private File wishlistFile;
+    private List<Wishlist> wishlists;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         cardViewIntent = getIntent();
         context = getApplicationContext();
+
+        wishlistNames = new ArrayList<>();
+
+        wishlistFile = new File(getFilesDir(), "wishlists.bin");
+        wishlists = loadWishlists();
+        if (wishlists != null) {
+            for (Wishlist wishlist :
+                    wishlists) {
+                wishlistNames.add(wishlist.getName());
+            }
+        } else {
+            try {
+                wishlistFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         Bundle extras = cardViewIntent.getExtras();
         if (extras.getString(VIEW_TYPE).equals(VIEW_CARD)) {
             setContentView(R.layout.layout_card_view);
@@ -45,17 +82,89 @@ public class CardViewActivity extends AppCompatActivity {
             setContentView(R.layout.layout_card_image_view);
         } else if ((card = (Card) extras.getSerializable(CARD)) == null) {
             throw new IllegalArgumentException();
-        }else{
+        } else {
             throw new IllegalArgumentException();
         }
-        if ((card = (Card) extras.getSerializable(CARD)) == null)
-        {
+        if ((card = (Card) extras.getSerializable(CARD)) == null) {
             throw new IllegalArgumentException();
         }
         setup();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_card_view, menu);
+        ComponentName cn = getCallingActivity();
+        String s = cn.getClassName();
+        return !s.equals("net.skyestudios.mtgcardquery.WishlistEditorActivity");
+    }
+
+    private void saveWishlists(List<Wishlist> wishlists) {
+        try {
+            FileOutputStream FOS = new FileOutputStream(wishlistFile);
+            ObjectOutputStream OOS = new ObjectOutputStream(FOS);
+            OOS.writeObject(wishlists);
+            OOS.close();
+            FOS.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private List<Wishlist> loadWishlists() {
+        try {
+            FileInputStream FIS = new FileInputStream(wishlistFile);
+            ObjectInputStream OIS = new ObjectInputStream(FIS);
+            ArrayList<Wishlist> wishlists = (ArrayList<Wishlist>) OIS.readObject();
+            OIS.close();
+            FIS.close();
+            return wishlists;
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.item_add_to_wishlist:
+
+                new AlertDialog.Builder(this)
+                        .setTitle("Wishlists")
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        })
+                        .setItems(wishlistNames.toArray(new String[0]), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                if (wishlists.get(i).contains(card)) {
+                                    new AlertDialog.Builder(CardViewActivity.this)
+                                            .setTitle("Error")
+                                            .setMessage("Card is already in selected wishlist")
+                                            .show();
+                                } else {
+                                    wishlists.get(i).addCard(card);
+                                    saveWishlists(wishlists);
+                                }
+
+                                dialogInterface.dismiss();
+                            }
+                        })
+                        .setCancelable(false)
+                        .show();
+                break;
+        }
+        return true;
+    }
+
     private void setup() {
+        toolbar = (Toolbar) this.findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         name = (TextView) this.findViewById(R.id.name_textView);
         name.setText(card.getName());
         colors = (TextView) this.findViewById(R.id.colors_textView);
