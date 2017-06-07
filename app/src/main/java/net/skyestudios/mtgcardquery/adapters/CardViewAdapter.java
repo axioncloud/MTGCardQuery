@@ -426,4 +426,10 @@ public class CardViewAdapter extends ArrayAdapter<CardView> {
             }
         }
     }
+
+    @Override
+    public void remove(CardView object) {
+        super.remove(object);
+        cardViews.remove(object);
+    }
 }

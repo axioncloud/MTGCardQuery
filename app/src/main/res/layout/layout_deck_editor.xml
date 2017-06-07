@@ -11,7 +11,7 @@
     tools:context="net.skyestudios.mtgcardquery.DeckViewActivity">
 
     <ListView
+        android:id="@+id/deck_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" 
-		android:id="@+id/deck_list" />
+        android:layout_height="match_parent" />
 </RelativeLayout>

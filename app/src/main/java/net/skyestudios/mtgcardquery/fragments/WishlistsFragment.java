@@ -162,8 +162,23 @@ public class WishlistsFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-        wishlistAdapter.remove(wishlistAdapter.getItem(i));
-        saveWishlists(wishlistAdapter.getWishlists());
+        new AlertDialog.Builder(getContext())
+                .setTitle("Delete Wishlist: " + wishlistAdapter.getWishlists().get(i).getName())
+                .setMessage("Are you sure you wish to delete this wishlist?")
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        wishlistAdapter.remove(wishlistAdapter.getItem(i));
+                        saveWishlists(wishlistAdapter.getWishlists());
+                    }
+                })
+                .show();
         return true;
     }
 }

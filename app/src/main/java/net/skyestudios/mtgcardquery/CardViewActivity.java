@@ -162,7 +162,8 @@ public class CardViewActivity extends AppCompatActivity {
     }
 
     private void setup() {
-        toolbar = (Toolbar) this.findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(card.getName());
         setSupportActionBar(toolbar);
 
         name = (TextView) this.findViewById(R.id.name_textView);

@@ -32,7 +32,7 @@ public class ResultsActivity extends AppCompatActivity implements AdapterView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_results);
+        setContentView(R.layout.layout_results);
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         queryString = getIntent().getStringExtra("queryString");
         waitingDialog = new ProgressDialog(this);
