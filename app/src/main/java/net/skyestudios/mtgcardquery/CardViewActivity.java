@@ -130,7 +130,7 @@ public class CardViewActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.item_add_to_wishlist:
 
-                new AlertDialog.Builder(this)
+                AlertDialog alertDialog = new AlertDialog.Builder(this)
                         .setTitle("Wishlists")
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                             @Override
@@ -145,6 +145,7 @@ public class CardViewActivity extends AppCompatActivity {
                                     new AlertDialog.Builder(CardViewActivity.this)
                                             .setTitle("Error")
                                             .setMessage("Card is already in selected wishlist")
+                                            .setNegativeButton("Dismiss", null)
                                             .show();
                                 } else {
                                     wishlists.get(i).addCard(card);
@@ -155,7 +156,18 @@ public class CardViewActivity extends AppCompatActivity {
                             }
                         })
                         .setCancelable(false)
-                        .show();
+                        .create();
+
+                if (wishlistNames.size() == 0) {
+                    alertDialog.setMessage("Uh, oh! There are no wishlists! Please go to the wishlist submenu in the navigation panel.");
+                    alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Dismiss", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+                }
+                alertDialog.show();
                 break;
         }
         return true;

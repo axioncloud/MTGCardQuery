@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,19 +55,23 @@ public class CardViewAdapter extends ArrayAdapter<CardView> {
         TextView text = (TextView) rowView.findViewById(R.id.card_text);
         TextView type = (TextView) rowView.findViewById(R.id.card_type);
         name.setText(cardViews.get(position).getName());
-        convertMana(cardViews.get(position).getManaCost(), manaCostHolder);
-        text.setText(cardViews.get(position).getText());
         type.setText(cardViews.get(position).getType());
+        text.setText(cardViews.get(position).getText());
+        convertMana(cardViews.get(position).getManaCost(), manaCostHolder, name.getLineCount());
         return rowView;
     }
 
-    private void convertMana(String manaCost, LinearLayout manaCostHolder) {
+    private void convertMana(String manaCost, LinearLayout manaCostHolder, int nameLines) {
         manaCost = manaCost.replaceAll("\\}", "\\},");
         String[] manaCostTokens = manaCost.split(",");
 
         for (String manaCostToken :
                 manaCostTokens) {
             ImageView manaImageView = new ImageView(getContext());
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            params.gravity = Gravity.CENTER_VERTICAL;
+            manaImageView.setLayoutParams(params);
 
             manaImageView.setPadding(0, 0, ((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getContext().getResources().getDisplayMetrics())), 0);
 
