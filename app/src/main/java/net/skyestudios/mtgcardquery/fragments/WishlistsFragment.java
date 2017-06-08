@@ -50,6 +50,12 @@ public class WishlistsFragment extends Fragment implements View.OnClickListener,
         wishlistFile = new File(getActivity().getFilesDir(), "wishlists.bin");
         wishlistAdapter = new WishlistViewAdapter(getContext(), R.layout.layout_item_wishlist);
         wishlistEditorIntent = new Intent(getContext(), WishlistEditorActivity.class);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        wishlistAdapter.clear();
 
         if (!wishlistFile.exists()) {
             try {
@@ -58,7 +64,9 @@ public class WishlistsFragment extends Fragment implements View.OnClickListener,
                 e.printStackTrace();
             }
         } else {
-            wishlistAdapter.addAll(loadWishlists());
+            List<Wishlist> wishlists = loadWishlists();
+            wishlistAdapter.addAll(wishlists);
+            wishlistAdapter.notifyDataSetChanged();
         }
     }
 

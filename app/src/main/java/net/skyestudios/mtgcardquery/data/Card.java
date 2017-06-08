@@ -1,6 +1,10 @@
 package net.skyestudios.mtgcardquery.data;
 
+import net.skyestudios.mtgcardquery.views.CardView;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by arkeonet64 on 4/4/2017.
@@ -55,6 +59,15 @@ public class Card implements Serializable {
         hand = 0;
         life = 0;
         names = "";
+    }
+
+    public static List<Card> createListFromCardViews(List<CardView> cardViews) {
+        ArrayList<Card> cards = new ArrayList<>();
+        for (CardView cardView :
+                cardViews) {
+            cards.add(cardView.getCard());
+        }
+        return cards;
     }
 
     @Override

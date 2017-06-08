@@ -24,6 +24,10 @@ public class CardView {
         return cardViews;
     }
 
+    public Card getCard() {
+        return card;
+    }
+
     public String getName() {
         return card.getName();
     }

@@ -28,6 +28,12 @@ public class WishlistViewAdapter extends ArrayAdapter<Wishlist> {
         wishlists = new ArrayList<>();
     }
 
+    @Override
+    public void clear() {
+        super.clear();
+        wishlists.clear();
+    }
+
     public List<Wishlist> getWishlists() {
         return wishlists;
     }

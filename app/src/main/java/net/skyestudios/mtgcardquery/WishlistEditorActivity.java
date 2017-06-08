@@ -27,6 +27,7 @@ import java.util.List;
 
 public class WishlistEditorActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, View.OnClickListener {
 
+    private Wishlist wishlist;
     private ListView card_listview;
     private CardViewAdapter cardViewAdapter;
     private Intent cardViewIntent;
@@ -61,7 +62,10 @@ public class WishlistEditorActivity extends AppCompatActivity implements Adapter
         cardViewAdapter.addAll(CardView.createListFromCards(cards));
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(loadWishlists().get(wishlist_position).getName());
+
+        wishlist = loadWishlists().get(wishlist_position);
+
+        toolbar.setTitle(wishlist.getName());
         setSupportActionBar(toolbar);
 
         selected_cards = new ArrayList<>();
@@ -105,9 +109,17 @@ public class WishlistEditorActivity extends AppCompatActivity implements Adapter
             if (selected_cards.contains(cardViewAdapter.getItem(i))) {
                 view.setBackgroundColor(Color.TRANSPARENT);
                 selected_cards.remove(cardViewAdapter.getItem(i));
+                if (all_selected) {
+                    all_selected = false;
+                    button_select_all_cards.setImageResource(R.drawable.ic_select_all_white_48dp);
+                }
             } else {
                 view.setBackgroundColor(Color.LTGRAY);
                 selected_cards.add(cardViewAdapter.getItem(i));
+                if (selected_cards.size() == cardViewAdapter.getCount()) {
+                    all_selected = true;
+                    button_select_all_cards.setImageResource(R.drawable.ic_deselect_all);
+                }
             }
         }
     }
@@ -200,7 +212,12 @@ public class WishlistEditorActivity extends AppCompatActivity implements Adapter
                 cardViewAdapter.remove(selected_cards.get(i));
                 cardViewAdapter.notifyDataSetChanged();
             }
+
+            wishlist.getCards().removeAll(Card.createListFromCardViews(selected_cards));
             selected_cards.clear();
+            List<Wishlist> wishlists = loadWishlists();
+            wishlists.set(wishlist_position, wishlist);
+            saveWishlists(wishlists);
             resetToolbar();
         }
     }
