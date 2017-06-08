@@ -6,4 +6,6 @@
     <string name="navigation_drawer_close">Drawer closed</string>
     <string name="navigation_bar_header">Navigation Bar Header</string>
     <string name="mtg_card_query_logo">MTG Card Query Logo</string>
+    <string name="application_information">This application aims to create an enjoyable, yet usable interface to construct decks, wishlists, and search for Magic The Gathering cards.</string>
+    <string name="mtg_legal_information">Magic The Gathering, the Magic The Gathering Logo, Wizards of the Coast, the Wizards of the Coast Logo, and all card information/images belongs to Wizards of the Coast. All rights reserved.</string>
 </resources>

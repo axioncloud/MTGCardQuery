@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.util.JsonReader;
 import android.util.Log;
 
@@ -25,7 +24,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
@@ -245,19 +243,6 @@ public class AssetProcessor extends AsyncTask<Void, String, Void> {
         } else {
             AssetProcessorNotification.notify(context, String.format(Locale.US, "%s",
                     "Cancelled"), 0);
-        }
-        try {
-            File backupDB = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Database.sqlite");
-            File currentDB = context.getDatabasePath(MTGCardSQLiteHelper.DB_NAME);
-            if (currentDB.exists()) {
-                FileChannel src = new FileInputStream(currentDB).getChannel();
-                FileChannel dst = new FileOutputStream(backupDB).getChannel();
-                dst.transferFrom(src, 0, src.size());
-                src.close();
-                dst.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 

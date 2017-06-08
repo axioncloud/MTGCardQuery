@@ -8,13 +8,16 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import net.skyestudios.mtgcardquery.R;
 import net.skyestudios.mtgcardquery.WishlistEditorActivity;
@@ -33,12 +36,13 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class WishlistsFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
+public class WishlistsFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemClickListener {
 
     File wishlistFile;
     ListView list_wishlists;
     WishlistViewAdapter wishlistAdapter;
     Intent wishlistEditorIntent;
+    private int wishlist_position;
 
     public WishlistsFragment() {
         // Required empty public constructor
@@ -64,10 +68,20 @@ public class WishlistsFragment extends Fragment implements View.OnClickListener,
                 e.printStackTrace();
             }
         } else {
-            List<Wishlist> wishlists = loadWishlists();
-            wishlistAdapter.addAll(wishlists);
-            wishlistAdapter.notifyDataSetChanged();
+            wishlistAdapter.addAll(loadWishlists());
+            if ((wishlist_position = wishlistEditorIntent.getIntExtra("wishlist_position", -1)) != -1) {
+                TextView num_cards = ((TextView) list_wishlists.getChildAt(wishlist_position).findViewById(R.id.wishlist_num_cards));
+                Wishlist wishlist = wishlistAdapter.getItem(wishlist_position);
+                int numberOfCards = wishlist.getNumberOfCards();
+                num_cards.setText(String.valueOf(numberOfCards));
+            }
         }
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getActivity().getMenuInflater().inflate(R.menu.menu_wishlist_context, menu);
     }
 
     private void saveWishlists(List<Wishlist> wishlists) {
@@ -97,6 +111,38 @@ public class WishlistsFragment extends Fragment implements View.OnClickListener,
     }
 
     @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        super.onContextItemSelected(item);
+        switch (item.getItemId()) {
+            case R.id.edit_wishlist:
+                wishlistEditorIntent.putExtra("wishlist_position", info.position);
+                startActivity(wishlistEditorIntent);
+                break;
+            case R.id.delete_wishlist:
+                new AlertDialog.Builder(getContext())
+                        .setTitle("Delete Wishlist: " + wishlistAdapter.getWishlists().get(info.position).getName())
+                        .setMessage("Are you sure you wish to delete this wishlist?")
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        })
+                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                wishlistAdapter.remove(wishlistAdapter.getItem(info.position));
+                                saveWishlists(wishlistAdapter.getWishlists());
+                            }
+                        })
+                        .show();
+                break;
+        }
+        return true;
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -105,7 +151,8 @@ public class WishlistsFragment extends Fragment implements View.OnClickListener,
         list_wishlists = (ListView) view.findViewById(R.id.wishlist_ListView);
         list_wishlists.setAdapter(wishlistAdapter);
         list_wishlists.setOnItemClickListener(this);
-        list_wishlists.setOnItemLongClickListener(this);
+//        list_wishlists.setOnItemLongClickListener(this);
+        registerForContextMenu(list_wishlists);
         return view;
     }
 
@@ -117,6 +164,7 @@ public class WishlistsFragment extends Fragment implements View.OnClickListener,
                 wishlistName.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
                 wishlistName.setText("Wishlist" + wishlistAdapter.getWishlists().size());
                 wishlistName.setSelection(wishlistName.getText().toString().length());
+                wishlistName.selectAll();
                 AlertDialog createWishlistDialog = new AlertDialog.Builder(getContext())
                         .setTitle("Create New Wishlist")
                         .setView(wishlistName)
@@ -166,27 +214,5 @@ public class WishlistsFragment extends Fragment implements View.OnClickListener,
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         wishlistEditorIntent.putExtra("wishlist_position", i);
         startActivity(wishlistEditorIntent);
-    }
-
-    @Override
-    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-        new AlertDialog.Builder(getContext())
-                .setTitle("Delete Wishlist: " + wishlistAdapter.getWishlists().get(i).getName())
-                .setMessage("Are you sure you wish to delete this wishlist?")
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                })
-                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        wishlistAdapter.remove(wishlistAdapter.getItem(i));
-                        saveWishlists(wishlistAdapter.getWishlists());
-                    }
-                })
-                .show();
-        return true;
     }
 }
