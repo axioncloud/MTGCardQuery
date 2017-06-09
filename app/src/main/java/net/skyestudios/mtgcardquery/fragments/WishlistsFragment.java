@@ -151,7 +151,6 @@ public class WishlistsFragment extends Fragment implements View.OnClickListener,
         list_wishlists = (ListView) view.findViewById(R.id.wishlist_ListView);
         list_wishlists.setAdapter(wishlistAdapter);
         list_wishlists.setOnItemClickListener(this);
-//        list_wishlists.setOnItemLongClickListener(this);
         registerForContextMenu(list_wishlists);
         return view;
     }

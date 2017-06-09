@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FragmentManager fragmentManager;
     private Toast backPressedToast;
     private Handler handler;
+    private String key_fragment_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.layout_drawer);
 
         File settingsFile = new File(getFilesDir(), "settings.bin");
+        key_fragment_name = "fragment_name";
 
         try {
             //If the file does not exist, create file and return true
@@ -90,7 +92,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if (savedInstanceState == null) {
             fragment = new QueryFragment();
-            fragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit();
+            Bundle args = new Bundle();
+            args.putString(key_fragment_name, toolbar.getTitle().toString());
+            fragment.setArguments(args);
+            fragmentManager.beginTransaction().addToBackStack(null).replace(R.id.fragment_container, fragment).commit();
 
             navigationView.setCheckedItem(R.id.item_card_search);
             currentDrawerID = R.id.item_card_search;
@@ -114,46 +119,71 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         if (!item.isChecked()) {
-            currentDrawerID = item.getItemId();
-            displayFragment();
-            drawer.closeDrawer(GravityCompat.START, true);
+            if (fragmentManager.getBackStackEntryCount() > 1) {
+                fragment = fragmentManager.getFragments().get(fragmentManager.getBackStackEntryCount() - 2);
+            }
+            if ((fragment.getArguments().getString(key_fragment_name).endsWith("Query") && item.getItemId() == R.id.item_card_search)
+                    || (fragment.getArguments().getString(key_fragment_name).endsWith("About") && item.getItemId() == R.id.item_about)
+                    || (fragment.getArguments().getString(key_fragment_name).endsWith("Settings") && item.getItemId() == R.id.item_settings)
+                    || (fragment.getArguments().getString(key_fragment_name).endsWith("Decks") && item.getItemId() == R.id.item_decks)
+                    || (fragment.getArguments().getString(key_fragment_name).endsWith("Wishlists") && item.getItemId() == R.id.item_wishlists)) {
+                performBackTravel();
+                drawer.closeDrawer(GravityCompat.START, true);
+            } else {
+                currentDrawerID = item.getItemId();
+                displayFragment();
+                drawer.closeDrawer(GravityCompat.START, true);
+            }
         }
         return false;
     }
 
     private void displayFragment() {
+        Bundle args = new Bundle();
+
         switch (currentDrawerID) {
             case R.id.item_card_search:
                 toolbar.setTitle(R.string.app_name);
                 fragment = new QueryFragment();
+                args.putString(key_fragment_name, toolbar.getTitle().toString());
+                fragment.setArguments(args);
                 fragmentManager.beginTransaction().addToBackStack(null).replace(R.id.fragment_container, fragment).commit();
                 break;
             case R.id.item_wishlists:
                 toolbar.setTitle(getString(R.string.app_name) + ": Wishlists");
                 fragment = new WishlistsFragment();
+                args.putString(key_fragment_name, toolbar.getTitle().toString());
+                fragment.setArguments(args);
                 fragmentManager.beginTransaction().addToBackStack(null).replace(R.id.fragment_container, fragment).commit();
                 break;
             case R.id.item_settings:
                 toolbar.setTitle(getString(R.string.app_name) + ": Settings");
                 fragment = new SettingsFragment();
-                Bundle args = new Bundle();
                 args.putSerializable("settings", settings);
+                fragment.setArguments(args);
+                args.putString(key_fragment_name, toolbar.getTitle().toString());
                 fragment.setArguments(args);
                 fragmentManager.beginTransaction().addToBackStack(null).replace(R.id.fragment_container, fragment).commit();
                 break;
             case R.id.item_decks:
                 toolbar.setTitle(getString(R.string.app_name) + ": Decks");
                 fragment = new DecksFragment();
+                args.putString(key_fragment_name, toolbar.getTitle().toString());
+                fragment.setArguments(args);
                 fragmentManager.beginTransaction().addToBackStack(null).replace(R.id.fragment_container, fragment).commit();
                 break;
             case R.id.item_about:
                 toolbar.setTitle(getString(R.string.app_name) + ": About");
                 fragment = new AboutFragment();
+                args.putString(key_fragment_name, toolbar.getTitle().toString());
+                fragment.setArguments(args);
                 fragmentManager.beginTransaction().addToBackStack(null).replace(R.id.fragment_container, fragment).commit();
                 break;
             default:
                 toolbar.setTitle(getString(R.string.app_name));
                 fragment = new QueryFragment();
+                args.putString(key_fragment_name, toolbar.getTitle().toString());
+                fragment.setArguments(args);
                 fragmentManager.beginTransaction().addToBackStack(null).replace(R.id.fragment_container, fragment).commit();
                 break;
         }
@@ -173,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onBackPressed() {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START, true);
-        } else if (!backPressedOnce) {
+        } else if (!backPressedOnce && fragmentManager.getBackStackEntryCount() == 1) {
             backPressedOnce = true;
             backPressedToast = Toast.makeText(getApplicationContext(), "Press back again to exit", Toast.LENGTH_SHORT);
             backPressedToast.show();
@@ -184,9 +214,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     backPressedOnce = false;
                 }
             }, 2500);
+        } else if (fragmentManager.getBackStackEntryCount() > 1) {
+            performBackTravel();
         } else {
             backPressedToast.cancel();
             finish();
         }
+    }
+
+    private void performBackTravel() {
+        fragmentManager.popBackStackImmediate();
+        fragment = fragmentManager.getFragments().get(fragmentManager.getBackStackEntryCount() - 1);
+        String fragment_name = fragment.getArguments().getString(key_fragment_name);
+        toolbar.setTitle(fragment_name);
+        if (fragment_name.endsWith("Query")) {
+            currentDrawerID = R.id.item_card_search;
+        } else if (fragment_name.endsWith("Wishlists")) {
+            currentDrawerID = R.id.item_wishlists;
+        } else if (fragment_name.endsWith("Decks")) {
+            currentDrawerID = R.id.item_decks;
+        } else if (fragment_name.endsWith("Settings")) {
+            currentDrawerID = R.id.item_settings;
+        } else if (fragment_name.endsWith("About")) {
+            currentDrawerID = R.id.item_about;
+        }
+        navigationView.setCheckedItem(currentDrawerID);
     }
 }
